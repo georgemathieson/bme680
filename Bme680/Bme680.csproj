@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RestoreSources>
+      $(RestoreSources);
+      https://dotnet.myget.org/F/dotnet-core/api/v3/index.json;
+    </RestoreSources>
   </PropertyGroup>
 
   <ItemGroup>
