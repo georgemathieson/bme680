@@ -35,7 +35,7 @@ namespace Bme680.Tests
         /// Ensure that the primary I2C address is 0x76.
         /// </summary>
         [Fact]
-        public void I2cAddressPrimary_ShouldBe_0x76()
+        public void I2cAddressPrimary_HasValue_0x76()
         {
             // Arrange.
             byte expected = 0x76;
@@ -51,7 +51,7 @@ namespace Bme680.Tests
         /// Ensure that the secondary I2C address is 0x77.
         /// </summary>
         [Fact]
-        public void I2cAddressSecondary_ShouldBe_0x77()
+        public void I2cAddressSecondary_HasValue_0x77()
         {
             // Arrange.
             byte expected = 0x77;
