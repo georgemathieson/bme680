@@ -1,11 +1,12 @@
-﻿using System.Device.I2c;
+using System;
+using System.Device.I2c;
 
 namespace Bme680
 {
     /// <summary>
     /// Represents a BME680 gas, temperature, humidity and pressure sensor over the I2C serial protocol.
     /// </summary>
-    public class Bme680
+    public class Bme680 : IDisposable
     {
         /// <summary>
         /// Pipeline to the <see cref="I2cDevice"/>.
@@ -19,6 +20,11 @@ namespace Bme680
         public Bme680(I2cDevice i2cDevice)
         {
             _i2cDevice = i2cDevice;
+        }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
         }
     }
 }
