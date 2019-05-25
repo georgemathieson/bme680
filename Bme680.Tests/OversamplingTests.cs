@@ -5,6 +5,12 @@ namespace Bme680.Tests
     /// <summary>
     /// Unit tests for <see cref="Oversampling"/>.
     /// </summary>
+    /// <remarks>
+    /// BME680 Datasheet sections:
+    ///  - 5.3.2.1 (humidity)
+    ///  - 5.3.2.2 (temperature)
+    ///  - 5.3.2.3 (pressure)
+    /// </remarks>
     public class OversamplingTests
     {
         /// <summary>
