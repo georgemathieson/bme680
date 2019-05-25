@@ -9,6 +9,21 @@ namespace Bme680
     public sealed class Bme680 : IDisposable
     {
         /// <summary>
+        /// Primary I2C address.
+        /// </summary>
+        public const byte I2cAddressPrimary = 0x76;
+
+        /// <summary>
+        /// Secondary I2C address.
+        /// </summary>
+        public const byte I2cAddressSecondary = 0x77;
+
+        /// <summary>
+        /// Chip ID of the BME68x product family.
+        /// </summary>
+        private const byte _chipId = 0x61;
+
+        /// <summary>
         /// The communications channel to this device on an I2C bus.
         /// </summary>
         private I2cDevice _i2cDevice;

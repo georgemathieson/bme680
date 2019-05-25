@@ -32,6 +32,38 @@ namespace Bme680.Tests
         }
 
         /// <summary>
+        /// Ensure that the primary I2C address is 0x76.
+        /// </summary>
+        [Fact]
+        public void I2cAddressPrimary_ShouldBe_0x76()
+        {
+            // Arrange.
+            byte expected = 0x76;
+
+            // Act.
+            var actual = Bme680.I2cAddressPrimary;
+
+            // Assert.
+            Assert.Equal(expected, actual);
+        }
+
+        /// <summary>
+        /// Ensure that the secondary I2C address is 0x77.
+        /// </summary>
+        [Fact]
+        public void I2cAddressSecondary_ShouldBe_0x77()
+        {
+            // Arrange.
+            byte expected = 0x77;
+
+            // Act.
+            var actual = Bme680.I2cAddressSecondary;
+
+            // Assert.
+            Assert.Equal(expected, actual);
+        }
+
+        /// <summary>
         /// Ensure that <see cref="I2cDevice.Dispose(true)"/> is called when <see cref="Bme680.Dispose()"/> is called.
         /// </summary>
         /// <remarks>
