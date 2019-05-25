@@ -4,12 +4,12 @@ using System.Device.I2c;
 namespace Bme680
 {
     /// <summary>
-    /// Represents a BME680 gas, temperature, humidity and pressure sensor over the I2C serial protocol.
+    /// Represents a BME680 gas, temperature, humidity and pressure sensor.
     /// </summary>
     public class Bme680 : IDisposable
     {
         /// <summary>
-        /// Pipeline to the <see cref="I2cDevice"/>.
+        /// The communications channel to this device on an I2C bus.
         /// </summary>
         private I2cDevice _i2cDevice;
 
