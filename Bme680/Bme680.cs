@@ -11,7 +11,7 @@ namespace Bme680
         /// <summary>
         /// Pipeline to the <see cref="I2cDevice"/>.
         /// </summary>
-        internal I2cDevice _i2cDevice;
+        private I2cDevice _i2cDevice;
 
         /// <summary>
         /// Initialise a new instance of the <see cref="Bme680"/> class.
