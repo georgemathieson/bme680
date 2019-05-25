@@ -6,7 +6,7 @@ namespace Bme680
     /// <summary>
     /// Represents a BME680 gas, temperature, humidity and pressure sensor.
     /// </summary>
-    public class Bme680 : IDisposable
+    public sealed class Bme680 : IDisposable
     {
         /// <summary>
         /// The communications channel to this device on an I2C bus.
