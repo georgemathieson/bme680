@@ -5,5 +5,5 @@ env:
   - RUNTIME=win10-x64
   - RUNTIME=linux-arm
 script:
- - dotnet build
- 
+  - dotnet build -c Release
+  - dotnet test

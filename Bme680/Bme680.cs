@@ -14,7 +14,7 @@ namespace Bme680
         private I2cDevice _i2cDevice;
 
         /// <summary>
-        /// Initialise a new instance of the <see cref="Bme680"/> class.
+        /// Initialize a new instance of the <see cref="Bme680"/> class.
         /// </summary>
         /// <param name="i2cDevice">The <see cref="I2cDevice"/> to create with.</param>
         public Bme680(I2cDevice i2cDevice)
@@ -22,9 +22,13 @@ namespace Bme680
             _i2cDevice = i2cDevice;
         }
 
+        /// <summary>
+        /// Cleanup.
+        /// </summary>
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _i2cDevice?.Dispose();
+            _i2cDevice = null;
         }
     }
 }
