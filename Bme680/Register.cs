@@ -6,8 +6,11 @@
     public enum Register : byte
     {
         /// <summary>
-        /// Chip ID of the device.
+        /// Register for retrieving the chip ID of the device. 
         /// </summary>
-        ChipId = 0xD0
+        /// <remarks>
+        /// Status register. This register is read-only.
+        /// </remarks>
+        Id = 0xD0
     }
 }

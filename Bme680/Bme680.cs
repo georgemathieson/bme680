@@ -19,9 +19,9 @@ namespace Bme680
         public const byte I2cAddressSecondary = 0x77;
 
         /// <summary>
-        /// Chip ID of the BME68x product family.
+        /// The expected chip ID of the BME68x product family.
         /// </summary>
-        private const byte _chipId = 0x61;
+        private const byte _expectedChipId = 0x61;
 
         /// <summary>
         /// The communications channel to this device on an I2C bus.
