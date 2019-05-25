@@ -32,9 +32,10 @@ namespace Bme680
         /// Initialize a new instance of the <see cref="Bme680"/> class.
         /// </summary>
         /// <param name="i2cDevice">The <see cref="I2cDevice"/> to create with.</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public Bme680(I2cDevice i2cDevice)
         {
-            _i2cDevice = i2cDevice;
+            _i2cDevice = i2cDevice ?? throw new ArgumentNullException(nameof(i2cDevice));
         }
 
         /// <summary>

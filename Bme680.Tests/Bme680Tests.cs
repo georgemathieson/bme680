@@ -64,6 +64,17 @@ namespace Bme680.Tests
         }
 
         /// <summary>
+        /// Ensure that an <see cref="ArgumentNullException"/> is thrown if <see cref="Bme680.Bme680(I2cDevice)"/>
+        /// is called with a null <see cref="I2cDevice"/>.
+        /// </summary>
+        [Fact]
+        public void Bme680_NullI2cDevice_ThrowsArgumentNullException()
+        {
+            // Arrange, Act and Assert.
+            Assert.Throws<ArgumentNullException>(() => new Bme680(null));
+        }
+
+        /// <summary>
         /// Ensure that <see cref="I2cDevice.Dispose(true)"/> is called when <see cref="Bme680.Dispose()"/> is called.
         /// </summary>
         /// <remarks>
