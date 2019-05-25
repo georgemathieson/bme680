@@ -1,6 +1,7 @@
 using System;
-using System.Reflection;
 using System.Device.I2c;
+using System.Linq;
+using System.Reflection;
 using Moq;
 using Xunit;
 
@@ -22,12 +23,24 @@ namespace Bme680.Tests
         private readonly Bme680 _bme680;
 
         /// <summary>
+        /// The expected chip ID of the BME68x product family.
+        /// </summary>
+        private const byte _expectedChipId = 0x61;
+
+        /// <summary>
         /// Initialize a new instance of the <see cref="Bme680"/> class.
         /// </summary>
         public Bme680Tests()
         {
             // Arrange.
             _mockI2cDevice = new Mock<I2cDevice>();
+            _mockI2cDevice
+                .Setup(i2cDevice => i2cDevice.ConnectionSettings)
+                .Returns(new I2cConnectionSettings(default, Bme680.I2cAddressPrimary));
+            _mockI2cDevice
+                .Setup(i2cDevice => i2cDevice.ReadByte())
+                .Returns(_expectedChipId);
+
             _bme680 = new Bme680(_mockI2cDevice.Object);
         }
 
@@ -64,14 +77,72 @@ namespace Bme680.Tests
         }
 
         /// <summary>
-        /// Ensure that an <see cref="ArgumentNullException"/> is thrown if <see cref="Bme680.Bme680(I2cDevice)"/>
-        /// is called with a null <see cref="I2cDevice"/>.
+        /// On construction, ensure that an <see cref="ArgumentNullException"/> is thrown if 
+        /// <see cref="Bme680.Bme680(I2cDevice)"/> is called with a null <see cref="I2cDevice"/>.
         /// </summary>
         [Fact]
         public void Bme680_NullI2cDevice_ThrowsArgumentNullException()
         {
             // Arrange, Act and Assert.
             Assert.Throws<ArgumentNullException>(() => new Bme680(null));
+        }
+
+        /// <summary>
+        /// On construction, ensure that all invalid addresses throw an <see cref="ArgumentOutOfRangeException"/>.
+        /// </summary>
+        [Fact]
+        public void Bme680_AddressOutOfRange_ThrowsArgumentOutOfRangeException()
+        {
+            // Arrange.
+            var invalidAddresses = Enumerable.Range(byte.MinValue, byte.MaxValue)
+                .Where(address => 
+                    address != Bme680.I2cAddressPrimary && 
+                    address != Bme680.I2cAddressSecondary);
+
+            foreach (var invalidAddress in invalidAddresses)
+            {
+                _mockI2cDevice
+                    .Setup(i2cDevice => i2cDevice.ConnectionSettings)
+                    .Returns(new I2cConnectionSettings(default, invalidAddress));
+
+                // Act and Assert.
+                Assert.Throws<ArgumentOutOfRangeException>(() => new Bme680(_mockI2cDevice.Object));
+            }
+        }
+
+        /// <summary>
+        /// On construction, ensure that <see cref="I2cDevice.WriteByte(byte)"/> is called with the <see cref="Register.Id"/>.
+        /// </summary>
+        [Fact]
+        public void Bme680_Writes_RegisterId()
+        {
+            // Assert (Arrange and Act done in the test's constructor).
+            _mockI2cDevice.Verify(i2cDevice => i2cDevice.WriteByte((byte)Register.Id), Times.Once);
+        }
+
+        /// <summary>
+        /// On construction, ensure that the <see cref="I2cDevice.ReadByte()"/> is called to get the device id.
+        /// </summary>
+        [Fact]
+        public void Bme680_Calls_ReadByte()
+        {
+            // Assert (Arrange and Act done in the test's constructor).
+            _mockI2cDevice.Verify(i2cDevice => i2cDevice.ReadByte(), Times.Once);
+        }
+
+        /// <summary>
+        /// On construction, if the chip ID does not match what is expected (0x61), then a <see cref="Bme680Exception"/> is thrown.
+        /// </summary>
+        [Fact]
+        public void Bme680_WrongChipId_ThrowsBme680Exception()
+        {
+            // Arrange.
+            _mockI2cDevice
+                .Setup(i2cDevice => i2cDevice.ReadByte())
+                .Returns(default(byte));
+
+            // Act and Assert.
+            Assert.Throws<Bme680Exception>(() => new Bme680(_mockI2cDevice.Object));
         }
 
         /// <summary>
