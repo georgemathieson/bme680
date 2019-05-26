@@ -58,6 +58,18 @@ namespace Bme680
         }
 
         /// <summary>
+        /// Set the temperature oversampling.
+        /// </summary>
+        /// <param name="oversampling">The <see cref="Oversampling"/> value to set.</param>
+        public void SetTemperatureOversampling(Oversampling oversampling)
+        {
+            var register = (byte)Register.Ctrl_meas;
+            _comDevice.WriteByte(register);
+            var read = _comDevice.ReadByte();
+            _comDevice.Write(new[] { register, (byte)(read + (byte)oversampling << 5) });
+        }
+
+        /// <summary>
         /// Cleanup.
         /// </summary>
         public void Dispose()

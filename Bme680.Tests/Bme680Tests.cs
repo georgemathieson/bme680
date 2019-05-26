@@ -147,6 +147,43 @@ namespace Bme680.Tests
         }
 
         /// <summary>
+        /// It should write the <see cref="Register.Ctrl_meas"/> register so the register value can be read from.
+        /// </summary>
+        [Fact]
+        public void SetTemperatureOversampling_WriteByte_ControlMeasurementRegister()
+        {
+            // Act.
+            _bme680.SetTemperatureOversampling(Oversampling.Skipped);
+
+            // Assert.
+            _mockComDevice.Verify(device => device.WriteByte((byte)Register.Ctrl_meas));
+        }
+
+        /// <summary>
+        /// Given any state of read bytes, the correct value the correct value should be written.
+        /// </summary>
+        /// <param name="readBytes">The read bytes to test with.</param>
+        [Theory]
+        [InlineData(0b_0000_0000)]
+        [InlineData(0b_1111_1111)]
+        public void SetTemperatureOversampling_Writess_CorrectValue(byte readBytes)
+        {
+            // Arrange.
+            var oversampling = Oversampling.x2;
+            byte expectedBytes = (byte)(readBytes + (byte)oversampling << 5);
+            byte[] expectedWrite = new[] { (byte)Register.Ctrl_meas, expectedBytes };
+            _mockComDevice
+                .Setup(device => device.ReadByte())
+                .Returns(readBytes);
+
+            // Act.
+            _bme680.SetTemperatureOversampling(oversampling);
+
+            // Assert.
+            _mockComDevice.Verify(device => device.Write(expectedWrite));
+        }
+
+        /// <summary>
         /// Ensure that <see cref="IComDevice.Dispose()"/> is called when <see cref="Bme680.Dispose()"/> is called.
         /// </summary>
         [Fact]
