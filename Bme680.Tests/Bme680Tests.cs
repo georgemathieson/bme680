@@ -2,6 +2,7 @@ using System;
 using System.Device.I2c;
 using System.Linq;
 using System.Reflection;
+using Bme680.Com;
 using Moq;
 using Xunit;
 
@@ -15,7 +16,7 @@ namespace Bme680.Tests
         /// <summary>
         /// A mock communications channel to a device on an I2C bus.
         /// </summary>
-        private readonly Mock<I2cDevice> _mockI2cDevice;
+        private readonly Mock<IComDevice> _mockComDevice;
 
         /// <summary>
         /// The <see cref="Bme680"/> to test with.
@@ -33,15 +34,15 @@ namespace Bme680.Tests
         public Bme680Tests()
         {
             // Arrange.
-            _mockI2cDevice = new Mock<I2cDevice>();
-            _mockI2cDevice
-                .Setup(i2cDevice => i2cDevice.ConnectionSettings)
-                .Returns(new I2cConnectionSettings(default, Bme680.DefaultI2cAddress));
-            _mockI2cDevice
-                .Setup(i2cDevice => i2cDevice.ReadByte())
+            _mockComDevice = new Mock<IComDevice>();
+            _mockComDevice
+                .Setup(device => device.DeviceAddress)
+                .Returns(Bme680.DefaultI2cAddress);
+            _mockComDevice
+                .Setup(device => device.ReadByte())
                 .Returns(_expectedChipId);
 
-            _bme680 = new Bme680(_mockI2cDevice.Object);
+            _bme680 = new Bme680(_mockComDevice.Object);
         }
 
         /// <summary>
@@ -78,10 +79,10 @@ namespace Bme680.Tests
 
         /// <summary>
         /// On construction, ensure that an <see cref="ArgumentNullException"/> is thrown if 
-        /// <see cref="Bme680.Bme680(I2cDevice)"/> is called with a null <see cref="I2cDevice"/>.
+        /// <see cref="Bme680.Bme680(IComDevice)"/> is called with a null <see cref="IComDevice"/>.
         /// </summary>
         [Fact]
-        public void Bme680_NullI2cDevice_ThrowsArgumentNullException()
+        public void Bme680_NullComDevice_ThrowsArgumentNullException()
         {
             // Arrange, Act and Assert.
             Assert.Throws<ArgumentNullException>(() => new Bme680(null));
@@ -95,39 +96,39 @@ namespace Bme680.Tests
         {
             // Arrange.
             var invalidAddresses = Enumerable.Range(byte.MinValue, byte.MaxValue)
-                .Where(address => 
-                    address != Bme680.DefaultI2cAddress && 
+                .Where(address =>
+                    address != Bme680.DefaultI2cAddress &&
                     address != Bme680.SecondaryI2cAddress);
 
             foreach (var invalidAddress in invalidAddresses)
             {
-                _mockI2cDevice
-                    .Setup(i2cDevice => i2cDevice.ConnectionSettings)
-                    .Returns(new I2cConnectionSettings(default, invalidAddress));
+                _mockComDevice
+                    .Setup(device => device.DeviceAddress)
+                    .Returns((byte)invalidAddress);
 
                 // Act and Assert.
-                Assert.Throws<ArgumentOutOfRangeException>(() => new Bme680(_mockI2cDevice.Object));
+                Assert.Throws<ArgumentOutOfRangeException>(() => new Bme680(_mockComDevice.Object));
             }
         }
 
         /// <summary>
-        /// On construction, ensure that <see cref="I2cDevice.WriteByte(byte)"/> is called with the <see cref="Register.ChipId"/>.
+        /// On construction, ensure that <see cref="device.WriteByte(byte)"/> is called with the <see cref="Register.Id"/>.
         /// </summary>
         [Fact]
         public void Bme680_Writes_RegisterId()
         {
             // Assert (Arrange and Act done in the test's constructor).
-            _mockI2cDevice.Verify(i2cDevice => i2cDevice.WriteByte((byte)Register.ChipId), Times.Once);
+            _mockComDevice.Verify(device => device.WriteByte((byte)Register.Id), Times.Once);
         }
 
         /// <summary>
-        /// On construction, ensure that the <see cref="I2cDevice.ReadByte()"/> is called to get the device id.
+        /// On construction, ensure that the <see cref="device.ReadByte()"/> is called to get the device id.
         /// </summary>
         [Fact]
         public void Bme680_Calls_ReadByte()
         {
             // Assert (Arrange and Act done in the test's constructor).
-            _mockI2cDevice.Verify(i2cDevice => i2cDevice.ReadByte(), Times.Once);
+            _mockComDevice.Verify(device => device.ReadByte(), Times.Once);
         }
 
         /// <summary>
@@ -137,45 +138,42 @@ namespace Bme680.Tests
         public void Bme680_WrongChipId_ThrowsBme680Exception()
         {
             // Arrange.
-            _mockI2cDevice
-                .Setup(i2cDevice => i2cDevice.ReadByte())
+            _mockComDevice
+                .Setup(device => device.ReadByte())
                 .Returns(default(byte));
 
             // Act and Assert.
-            Assert.Throws<Bme680Exception>(() => new Bme680(_mockI2cDevice.Object));
+            Assert.Throws<Bme680Exception>(() => new Bme680(_mockComDevice.Object));
         }
 
         /// <summary>
-        /// Ensure that <see cref="I2cDevice.Dispose(true)"/> is called when <see cref="Bme680.Dispose()"/> is called.
+        /// Ensure that <see cref="IComDevice.Dispose()"/> is called when <see cref="Bme680.Dispose()"/> is called.
         /// </summary>
-        /// <remarks>
-        /// By calling <see cref="I2cDevice.Dispose()"/> directly, we can safely assume <see cref="I2cDevice.Dispose(true)"/> will be called.
-        /// </remarks>
         [Fact]
-        public void Dispose_Calls_I2cDeviceDispose()
+        public void Dispose_Calls_deviceDispose()
         {
             // Act.
             _bme680.Dispose();
 
             // Assert.
-            _mockI2cDevice.Verify(i2cDevice => i2cDevice.Dispose(true), Times.Once);
+            _mockComDevice.Verify(device => device.Dispose(), Times.Once);
         }
 
         /// <summary>
-        /// Ensure that on calling <see cref="Bme680.Dispose()"/> that the <see cref="I2cDevice"/> stored internally is set to null.
+        /// Ensure that on calling <see cref="Bme680.Dispose()"/> that the <see cref="IComDevice"/> stored internally is set to null.
         /// </summary>
         [Fact]
-        public void Dispose_SetsI2cDevice_ToNull()
+        public void Dispose_SetsComDevice_ToNull()
         {
             // Arrange.
             var bindFlags = BindingFlags.Instance | BindingFlags.NonPublic;
-            var i2cDeviceFieldInfo = typeof(Bme680).GetField("_i2cDevice", bindFlags);
+            var fieldInfo = typeof(Bme680).GetField("_comDevice", bindFlags);
 
             // Act
             _bme680.Dispose();
 
             // Assert
-            Assert.Null(i2cDeviceFieldInfo.GetValue(_bme680));
+            Assert.Null(fieldInfo.GetValue(_bme680));
         }
 
         /// <summary>
