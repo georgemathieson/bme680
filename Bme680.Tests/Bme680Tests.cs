@@ -113,7 +113,7 @@ namespace Bme680.Tests
         /// Act done in the test's constructor
         /// </remarks>
         [Fact]
-        public void Bme680_Writes_RegisterId()
+        public void Bme680_CallsWriteByte_WithRegisterId()
         {
             // Arrange.
             var expected = (byte)Register.Id;
@@ -136,11 +136,43 @@ namespace Bme680.Tests
             Assert.Throws<Bme680Exception>(() => new Bme680(_mockI2cDevice));
         }
 
+        [Fact]
+        public void SetPowerMode_CallsWriteByte_WithControlMeasurementRegister()
+        {
+            // Arrange.
+            var expected = (byte)Register.Ctrl_meas;
+
+            // Act.
+            _bme680.SetPowerMode(PowerMode.Forced);
+
+            // Assert.
+            Assert.Equal(expected, _mockI2cDevice.WriteByteCalledWithValue);
+        }
+
+        [Theory]
+        [InlineData(0b_0000_0000)]
+        [InlineData(0b_1111_1111)]
+        public void SetPowerMode_CallsWrite_WithCorrectValue(byte readBits)
+        {
+            // Arrange.
+            _mockI2cDevice.ReadByteSetupReturns = readBits;
+            var powerMode = PowerMode.Forced;
+            var cleared = (byte)(readBits & 0b_1111_1100);
+            byte expectedBits = (byte)(cleared | (byte)powerMode);
+            byte[] expected = new[] { (byte)Register.Ctrl_meas, expectedBits };
+
+            // Act.
+            _bme680.SetPowerMode(powerMode);
+
+            // Assert.
+            Assert.Equal(expected, _mockI2cDevice.WriteCalledWithValue);
+        }
+
         /// <summary>
         /// It should write the <see cref="Register.Ctrl_meas"/> register so the register value can be read from.
         /// </summary>
         [Fact]
-        public void SetTemperatureOversampling_WriteByte_ControlMeasurementRegister()
+        public void SetTemperatureOversampling_CallsWriteByte_WithControlMeasurementRegister()
         {
             // Arrange.
             var expected = (byte)Register.Ctrl_meas;
@@ -153,26 +185,26 @@ namespace Bme680.Tests
         }
 
         /// <summary>
-        /// Given any state of read bytes, the correct value the correct value should be written.
+        /// Given any state of read bits, the correct value the correct value should be written.
         /// </summary>
-        /// <param name="readBytes">The read bytes to test with.</param>
+        /// <param name="readBits">The read bits to test with.</param>
         [Theory]
         [InlineData(0b_0000_0000)]
         [InlineData(0b_1111_1111)]
-        public void SetTemperatureOversampling_Writess_CorrectValue(byte readBytes)
+        public void SetTemperatureOversampling_CallsWrite_WithCorrectValue(byte readBits)
         {
             // Arrange.
+            _mockI2cDevice.ReadByteSetupReturns = readBits;
             var oversampling = Oversampling.x2;
-            byte expectedBytes = (byte)(readBytes + (byte)oversampling << 5);
-            byte[] expectedWrite = new[] { (byte)Register.Ctrl_meas, expectedBytes };
-
-            _mockI2cDevice.ReadByteSetupReturns = readBytes;
+            byte cleared = (byte)(readBits & 0b_0001_1111);
+            byte expectedBits = (byte)(cleared | (byte)oversampling << 5);
+            byte[] expected = new[] { (byte)Register.Ctrl_meas, expectedBits };
 
             // Act.
             _bme680.SetTemperatureOversampling(oversampling);
 
             // Assert.
-            Assert.Equal(expectedWrite, _mockI2cDevice.WriteCalledWithValue);
+            Assert.Equal(expected, _mockI2cDevice.WriteCalledWithValue);
         }
 
         /// <summary>

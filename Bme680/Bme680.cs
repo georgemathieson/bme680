@@ -58,6 +58,22 @@ namespace Bme680
         }
 
         /// <summary>
+        /// Set the power mode.
+        /// </summary>
+        /// <param name="powerMode">The <see cref="PowerMode"/> to set.</param>
+        public void SetPowerMode(PowerMode powerMode)
+        {
+            var register = (byte)Register.Ctrl_meas;
+            _i2cDevice.WriteByte(register);
+            var read = _i2cDevice.ReadByte();
+
+            // Clear first 2 bits.
+            var cleared = (byte)(read & 0b_1111_1100);
+
+            _i2cDevice.Write(new[] { register, (byte)(cleared | (byte)powerMode) });
+        }
+
+        /// <summary>
         /// Set the temperature oversampling.
         /// </summary>
         /// <param name="oversampling">The <see cref="Oversampling"/> value to set.</param>
@@ -65,10 +81,12 @@ namespace Bme680
         {
             var register = (byte)Register.Ctrl_meas;
             _i2cDevice.WriteByte(register);
-
             var read = _i2cDevice.ReadByte();
 
-            _i2cDevice.Write(new[] { register, (byte)(read + (byte)oversampling << 5) });
+            // Clear last 3 bits.
+            var cleared = (byte)(read & 0b_0001_1111);
+
+            _i2cDevice.Write(new[] { register, (byte)(cleared | (byte)oversampling << 5) });
         }
 
         /// <summary>
