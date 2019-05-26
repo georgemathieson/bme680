@@ -65,7 +65,9 @@ namespace Bme680
         {
             var register = (byte)Register.Ctrl_meas;
             _comDevice.WriteByte(register);
+
             var read = _comDevice.ReadByte();
+
             _comDevice.Write(new[] { register, (byte)(read + (byte)oversampling << 5) });
         }
 
