@@ -49,7 +49,7 @@ namespace Bme680
             }
 
             // Ensure the device exists on the bus.
-            _i2cDevice.WriteByte((byte)Register.Id);
+            _i2cDevice.WriteByte((byte)Register.ChipId);
             var readChipId = _i2cDevice.ReadByte();
             if (readChipId != _expectedChipId)
             {

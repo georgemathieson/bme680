@@ -111,13 +111,13 @@ namespace Bme680.Tests
         }
 
         /// <summary>
-        /// On construction, ensure that <see cref="I2cDevice.WriteByte(byte)"/> is called with the <see cref="Register.Id"/>.
+        /// On construction, ensure that <see cref="I2cDevice.WriteByte(byte)"/> is called with the <see cref="Register.ChipId"/>.
         /// </summary>
         [Fact]
         public void Bme680_Writes_RegisterId()
         {
             // Assert (Arrange and Act done in the test's constructor).
-            _mockI2cDevice.Verify(i2cDevice => i2cDevice.WriteByte((byte)Register.Id), Times.Once);
+            _mockI2cDevice.Verify(i2cDevice => i2cDevice.WriteByte((byte)Register.ChipId), Times.Once);
         }
 
         /// <summary>

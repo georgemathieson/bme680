@@ -11,6 +11,6 @@
         /// <remarks>
         /// Status register. This register is read-only.
         /// </remarks>
-        Id = 0xD0
+        ChipId = 0xD0
     }
 }

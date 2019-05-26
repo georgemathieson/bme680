@@ -8,7 +8,7 @@ namespace Bme680.Tests
     public class RegisterTests
     {
         /// <summary>
-        /// Ensure that <see cref="Register.Id"/> is set to 0xD0.
+        /// Ensure that <see cref="Register.ChipId"/> is set to 0xD0.
         /// </summary>
         /// <remarks>
         /// 0xD0 for I2C.
@@ -20,7 +20,7 @@ namespace Bme680.Tests
             byte expected = 0xD0;
 
             // Act.
-            var actual = (byte)Register.Id;
+            var actual = (byte)Register.ChipId;
 
             // Assert.
             Assert.Equal(expected, actual);
