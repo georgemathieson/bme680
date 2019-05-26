@@ -36,7 +36,7 @@ namespace Bme680.Tests
             _mockI2cDevice = new Mock<I2cDevice>();
             _mockI2cDevice
                 .Setup(i2cDevice => i2cDevice.ConnectionSettings)
-                .Returns(new I2cConnectionSettings(default, Bme680.I2cAddressPrimary));
+                .Returns(new I2cConnectionSettings(default, Bme680.DefaultI2cAddress));
             _mockI2cDevice
                 .Setup(i2cDevice => i2cDevice.ReadByte())
                 .Returns(_expectedChipId);
@@ -45,16 +45,16 @@ namespace Bme680.Tests
         }
 
         /// <summary>
-        /// Ensure that the primary I2C address is 0x76.
+        /// Ensure that the default I2C address is 0x76.
         /// </summary>
         [Fact]
-        public void I2cAddressPrimary_HasValue_0x76()
+        public void DefaultI2cAddress_HasValue_0x76()
         {
             // Arrange.
             byte expected = 0x76;
 
             // Act.
-            var actual = Bme680.I2cAddressPrimary;
+            var actual = Bme680.DefaultI2cAddress;
 
             // Assert.
             Assert.Equal(expected, actual);
@@ -64,13 +64,13 @@ namespace Bme680.Tests
         /// Ensure that the secondary I2C address is 0x77.
         /// </summary>
         [Fact]
-        public void I2cAddressSecondary_HasValue_0x77()
+        public void SecondaryI2cAddress_HasValue_0x77()
         {
             // Arrange.
             byte expected = 0x77;
 
             // Act.
-            var actual = Bme680.I2cAddressSecondary;
+            var actual = Bme680.SecondaryI2cAddress;
 
             // Assert.
             Assert.Equal(expected, actual);
@@ -96,8 +96,8 @@ namespace Bme680.Tests
             // Arrange.
             var invalidAddresses = Enumerable.Range(byte.MinValue, byte.MaxValue)
                 .Where(address => 
-                    address != Bme680.I2cAddressPrimary && 
-                    address != Bme680.I2cAddressSecondary);
+                    address != Bme680.DefaultI2cAddress && 
+                    address != Bme680.SecondaryI2cAddress);
 
             foreach (var invalidAddress in invalidAddresses)
             {

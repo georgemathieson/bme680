@@ -10,14 +10,14 @@ namespace Bme680
     public sealed class Bme680 : IDisposable
     {
         /// <summary>
-        /// Primary I2C address.
+        /// Default I2C address.
         /// </summary>
-        public const byte I2cAddressPrimary = 0x76;
+        public const byte DefaultI2cAddress = 0x76;
 
         /// <summary>
         /// Secondary I2C address.
         /// </summary>
-        public const byte I2cAddressSecondary = 0x77;
+        public const byte SecondaryI2cAddress = 0x77;
 
         /// <summary>
         /// The expected chip ID of the BME68x product family.
@@ -42,10 +42,10 @@ namespace Bme680
 
             // Ensure a valid device address has been set.
             var deviceAddress = i2cDevice.ConnectionSettings.DeviceAddress;
-            if (deviceAddress < I2cAddressPrimary || deviceAddress > I2cAddressSecondary)
+            if (deviceAddress < DefaultI2cAddress || deviceAddress > SecondaryI2cAddress)
             {
                 throw new ArgumentOutOfRangeException(nameof(i2cDevice),
-                    $"Chip address 0x{deviceAddress.ToString("X2")} is out of range for a BME680. Expected 0x{I2cAddressPrimary.ToString("X2")} or 0x{I2cAddressSecondary.ToString("X2")}");
+                    $"Chip address 0x{deviceAddress.ToString("X2")} is out of range for a BME680. Expected 0x{DefaultI2cAddress.ToString("X2")} or 0x{SecondaryI2cAddress.ToString("X2")}");
             }
 
             // Ensure the device exists on the bus.
