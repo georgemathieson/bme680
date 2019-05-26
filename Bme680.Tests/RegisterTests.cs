@@ -25,5 +25,21 @@ namespace Bme680.Tests
             // Assert.
             Assert.Equal(expected, actual);
         }
+
+        /// <summary>
+        /// Ensure that <see cref="Register.Ctrl_meas"/> is set to 0x74.
+        /// </summary>
+        [Fact]
+        public void Ctrl_meas_HasValue_0x74()
+        {
+            // Arrange.
+            byte expected = 0x74;
+
+            // Act.
+            var actual = (byte)Register.Ctrl_meas;
+
+            // Assert.
+            Assert.Equal(expected, actual);
+        }
     }
 }
