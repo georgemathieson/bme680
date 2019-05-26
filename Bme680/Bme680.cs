@@ -1,5 +1,5 @@
 using System;
-using Bme680.Com;
+using System.Device.I2c;
 
 namespace Bme680
 {
@@ -24,32 +24,32 @@ namespace Bme680
         private const byte _expectedChipId = 0x61;
 
         /// <summary>
-        /// The communications channel to a device on a communications bus.
+        /// The communications channel to a device on an I2C bus.
         /// </summary>
-        private IComDevice _comDevice;
+        private I2cDevice _i2cDevice;
 
         /// <summary>
         /// Initialize a new instance of the <see cref="Bme680"/> class.
         /// </summary>
-        /// <param name="comDevice">The <see cref="IComDevice"/> to create with.</param>
+        /// <param name="i2cDevice">The <see cref="I2cDevice"/> to create with.</param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="Bme680Exception"></exception>
-        public Bme680(IComDevice comDevice)
+        public Bme680(I2cDevice i2cDevice)
         {
-            _comDevice = comDevice ?? throw new ArgumentNullException(nameof(comDevice));
+            _i2cDevice = i2cDevice ?? throw new ArgumentNullException(nameof(i2cDevice));
 
             // Ensure a valid device address has been set.
-            var deviceAddress = comDevice.DeviceAddress;
+            var deviceAddress = i2cDevice.ConnectionSettings.DeviceAddress;
             if (deviceAddress < DefaultI2cAddress || deviceAddress > SecondaryI2cAddress)
             {
-                throw new ArgumentOutOfRangeException(nameof(comDevice),
+                throw new ArgumentOutOfRangeException(nameof(i2cDevice),
                     $"Chip address 0x{deviceAddress.ToString("X2")} is out of range for a BME680. Expected 0x{DefaultI2cAddress.ToString("X2")} or 0x{SecondaryI2cAddress.ToString("X2")}");
             }
 
             // Ensure the device exists on the I2C bus.
-            _comDevice.WriteByte((byte)Register.Id);
-            var readChipId = _comDevice.ReadByte();
+            _i2cDevice.WriteByte((byte)Register.Id);
+            var readChipId = _i2cDevice.ReadByte();
             if (readChipId != _expectedChipId)
             {
                 throw new Bme680Exception(
@@ -64,11 +64,11 @@ namespace Bme680
         public void SetTemperatureOversampling(Oversampling oversampling)
         {
             var register = (byte)Register.Ctrl_meas;
-            _comDevice.WriteByte(register);
+            _i2cDevice.WriteByte(register);
 
-            var read = _comDevice.ReadByte();
+            var read = _i2cDevice.ReadByte();
 
-            _comDevice.Write(new[] { register, (byte)(read + (byte)oversampling << 5) });
+            _i2cDevice.Write(new[] { register, (byte)(read + (byte)oversampling << 5) });
         }
 
         /// <summary>
@@ -76,8 +76,8 @@ namespace Bme680
         /// </summary>
         public void Dispose()
         {
-            _comDevice?.Dispose();
-            _comDevice = null;
+            _i2cDevice?.Dispose();
+            _i2cDevice = null;
         }
     }
 }

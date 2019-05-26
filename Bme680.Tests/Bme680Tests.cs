@@ -2,8 +2,6 @@ using System;
 using System.Device.I2c;
 using System.Linq;
 using System.Reflection;
-using Bme680.Com;
-using Moq;
 using Xunit;
 
 namespace Bme680.Tests
@@ -16,7 +14,7 @@ namespace Bme680.Tests
         /// <summary>
         /// A mock communications channel to a device on an I2C bus.
         /// </summary>
-        private readonly Mock<IComDevice> _mockComDevice;
+        private readonly MockI2cDevice _mockI2cDevice;
 
         /// <summary>
         /// The <see cref="Bme680"/> to test with.
@@ -34,15 +32,13 @@ namespace Bme680.Tests
         public Bme680Tests()
         {
             // Arrange.
-            _mockComDevice = new Mock<IComDevice>();
-            _mockComDevice
-                .Setup(device => device.DeviceAddress)
-                .Returns(Bme680.DefaultI2cAddress);
-            _mockComDevice
-                .Setup(device => device.ReadByte())
-                .Returns(_expectedChipId);
+            var settings = new I2cConnectionSettings(default, Bme680.DefaultI2cAddress);
+            _mockI2cDevice = new MockI2cDevice(settings);
 
-            _bme680 = new Bme680(_mockComDevice.Object);
+            // By default, return the expected chip ID.
+            _mockI2cDevice.ReadByteSetupReturns = _expectedChipId;
+
+            _bme680 = new Bme680(_mockI2cDevice);
         }
 
         /// <summary>
@@ -102,33 +98,29 @@ namespace Bme680.Tests
 
             foreach (var invalidAddress in invalidAddresses)
             {
-                _mockComDevice
-                    .Setup(device => device.DeviceAddress)
-                    .Returns((byte)invalidAddress);
+                var settings = new I2cConnectionSettings(default, invalidAddress);
+                var mockI2cDevice = new MockI2cDevice(settings);
 
                 // Act and Assert.
-                Assert.Throws<ArgumentOutOfRangeException>(() => new Bme680(_mockComDevice.Object));
+                Assert.Throws<ArgumentOutOfRangeException>(() => new Bme680(mockI2cDevice));
             }
         }
 
         /// <summary>
         /// On construction, ensure that <see cref="device.WriteByte(byte)"/> is called with the <see cref="Register.Id"/>.
         /// </summary>
+        /// <remarks>
+        /// Act done in the test's constructor
+        /// </remarks>
         [Fact]
         public void Bme680_Writes_RegisterId()
         {
-            // Assert (Arrange and Act done in the test's constructor).
-            _mockComDevice.Verify(device => device.WriteByte((byte)Register.Id), Times.Once);
-        }
+            // Arrange.
+            var expected = (byte)Register.Id;
+            var actual = _mockI2cDevice.WriteByteCalledWithValue;
 
-        /// <summary>
-        /// On construction, ensure that the <see cref="device.ReadByte()"/> is called to get the device id.
-        /// </summary>
-        [Fact]
-        public void Bme680_Calls_ReadByte()
-        {
-            // Assert (Arrange and Act done in the test's constructor).
-            _mockComDevice.Verify(device => device.ReadByte(), Times.Once);
+            // Assert.
+            Assert.Equal(expected, actual);
         }
 
         /// <summary>
@@ -138,12 +130,10 @@ namespace Bme680.Tests
         public void Bme680_WrongChipId_ThrowsBme680Exception()
         {
             // Arrange.
-            _mockComDevice
-                .Setup(device => device.ReadByte())
-                .Returns(default(byte));
+            _mockI2cDevice.ReadByteSetupReturns = default;
 
             // Act and Assert.
-            Assert.Throws<Bme680Exception>(() => new Bme680(_mockComDevice.Object));
+            Assert.Throws<Bme680Exception>(() => new Bme680(_mockI2cDevice));
         }
 
         /// <summary>
@@ -152,11 +142,14 @@ namespace Bme680.Tests
         [Fact]
         public void SetTemperatureOversampling_WriteByte_ControlMeasurementRegister()
         {
+            // Arrange.
+            var expected = (byte)Register.Ctrl_meas;
+
             // Act.
             _bme680.SetTemperatureOversampling(Oversampling.Skipped);
 
             // Assert.
-            _mockComDevice.Verify(device => device.WriteByte((byte)Register.Ctrl_meas));
+            Assert.Equal(expected, _mockI2cDevice.WriteByteCalledWithValue);
         }
 
         /// <summary>
@@ -172,15 +165,14 @@ namespace Bme680.Tests
             var oversampling = Oversampling.x2;
             byte expectedBytes = (byte)(readBytes + (byte)oversampling << 5);
             byte[] expectedWrite = new[] { (byte)Register.Ctrl_meas, expectedBytes };
-            _mockComDevice
-                .Setup(device => device.ReadByte())
-                .Returns(readBytes);
+
+            _mockI2cDevice.ReadByteSetupReturns = readBytes;
 
             // Act.
             _bme680.SetTemperatureOversampling(oversampling);
 
             // Assert.
-            _mockComDevice.Verify(device => device.Write(expectedWrite));
+            Assert.Equal(expectedWrite, _mockI2cDevice.WriteCalledWithValue);
         }
 
         /// <summary>
@@ -193,7 +185,7 @@ namespace Bme680.Tests
             _bme680.Dispose();
 
             // Assert.
-            _mockComDevice.Verify(device => device.Dispose(), Times.Once);
+            Assert.True(_mockI2cDevice.Disposing);
         }
 
         /// <summary>
@@ -204,7 +196,7 @@ namespace Bme680.Tests
         {
             // Arrange.
             var bindFlags = BindingFlags.Instance | BindingFlags.NonPublic;
-            var fieldInfo = typeof(Bme680).GetField("_comDevice", bindFlags);
+            var fieldInfo = typeof(Bme680).GetField("_i2cDevice", bindFlags);
 
             // Act
             _bme680.Dispose();
