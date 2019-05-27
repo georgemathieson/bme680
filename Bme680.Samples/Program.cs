@@ -25,7 +25,10 @@ namespace Bme680.Samples
             using (var bme680 = new Bme680(unixI2cDevice))
             {
                 bme680.SetTemperatureOversampling(Oversampling.x2);
-                Console.WriteLine("Yep, seems to be working!");
+                bme680.SetPowerMode(PowerMode.Forced);
+                var temperature = bme680.ReadTemperature();
+
+                Console.WriteLine($"Celsius: {temperature.Celsius}");
             }
         }
     }

@@ -25,5 +25,17 @@
         /// Power mode (bits 1 to 0).
         /// </remarks>
         Ctrl_meas = 0x74,
+
+        temp_xlsb = 0x24,
+
+        temp_lsb = 0x23,
+
+        temp_msb = 0x22,
+
+        cal_temp_1 = 0xE9,
+
+        cal_temp_2 = 0x8A,
+
+        cal_temp_3 = 0x8C,
     }
 }

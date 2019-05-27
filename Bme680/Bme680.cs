@@ -1,5 +1,8 @@
 using System;
+using System.Buffers.Binary;
 using System.Device.I2c;
+using System.Threading.Tasks;
+using Iot.Units;
 
 namespace Bme680
 {
@@ -40,7 +43,7 @@ namespace Bme680
             _i2cDevice = i2cDevice ?? throw new ArgumentNullException(nameof(i2cDevice));
 
             // Ensure a valid device address has been set.
-            var deviceAddress = i2cDevice.ConnectionSettings.DeviceAddress;
+            int deviceAddress = i2cDevice.ConnectionSettings.DeviceAddress;
             if (deviceAddress < DefaultI2cAddress || deviceAddress > SecondaryI2cAddress)
             {
                 throw new ArgumentOutOfRangeException(nameof(i2cDevice),
@@ -48,8 +51,7 @@ namespace Bme680
             }
 
             // Ensure the device exists on the I2C bus.
-            _i2cDevice.WriteByte((byte)Register.Id);
-            var readChipId = _i2cDevice.ReadByte();
+            byte readChipId = Read8Bits(Register.Id);
             if (readChipId != _expectedChipId)
             {
                 throw new Bme680Exception(
@@ -63,14 +65,13 @@ namespace Bme680
         /// <param name="powerMode">The <see cref="PowerMode"/> to set.</param>
         public void SetPowerMode(PowerMode powerMode)
         {
-            var register = (byte)Register.Ctrl_meas;
-            _i2cDevice.WriteByte(register);
-            var read = _i2cDevice.ReadByte();
+            var register = Register.Ctrl_meas;
+            byte read = Read8Bits(register);
 
             // Clear first 2 bits.
             var cleared = (byte)(read & 0b_1111_1100);
 
-            _i2cDevice.Write(new[] { register, (byte)(cleared | (byte)powerMode) });
+            _i2cDevice.Write(new[] { (byte)register, (byte)(cleared | (byte)powerMode) });
         }
 
         /// <summary>
@@ -79,14 +80,82 @@ namespace Bme680
         /// <param name="oversampling">The <see cref="Oversampling"/> value to set.</param>
         public void SetTemperatureOversampling(Oversampling oversampling)
         {
-            var register = (byte)Register.Ctrl_meas;
-            _i2cDevice.WriteByte(register);
-            var read = _i2cDevice.ReadByte();
+            var register = Register.Ctrl_meas;
+            byte read = Read8Bits(register);
 
             // Clear last 3 bits.
             var cleared = (byte)(read & 0b_0001_1111);
 
-            _i2cDevice.Write(new[] { register, (byte)(cleared | (byte)oversampling << 5) });
+            _i2cDevice.Write(new[] { (byte)register, (byte)(cleared | (byte)oversampling << 5) });
+        }
+
+        public Temperature ReadTemperature()
+        {
+            // Read temperature calibration data.
+            ushort cal1 = Read16Bits(Register.cal_temp_1);
+            ushort cal2 = Read16Bits(Register.cal_temp_2);
+            byte cal3 = Read8Bits(Register.cal_temp_3);
+
+            Console.WriteLine($"cal1: {cal1}");
+            Console.WriteLine($"cal2: {cal2}");
+            Console.WriteLine($"cal3: {cal3}");
+
+            // Read temperature data.
+            byte msb = Read8Bits(Register.temp_msb);
+            byte lsb = Read8Bits(Register.temp_lsb);
+            byte xlsb = Read8Bits(Register.temp_xlsb);
+
+            Console.WriteLine($"msb: {msb}");
+            Console.WriteLine($"lsb: {lsb}");
+            Console.WriteLine($"xlsb: {xlsb}");
+
+            // Convert to a 32bit integer.
+            int adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
+            Console.WriteLine($"ADC Temperature: {adcTemperature}");
+
+            // Calculate the temperature value in float format.
+            double var1 = ((adcTemperature / 16384.0) - (cal1 / 1024.0)) * cal2;
+            double var2 = ((adcTemperature / 131072.0) - (cal1 / 8192.0)) * cal3;
+            Console.WriteLine($"var1: {var1}");
+            Console.WriteLine($"var2: {var2}");
+
+
+            // Temperature fine value.
+            var temperatureFine = var1 + var2;
+            Console.WriteLine($"Temperature Fine: {temperatureFine}");
+
+            // Compensated temperature data.
+            var calculatedTemperature = temperatureFine / 5120.0;
+            Console.WriteLine($"Calculated Temperature: {calculatedTemperature}");
+
+            return Temperature.FromCelsius(calculatedTemperature);
+        }
+
+        /// <summary>
+        /// Read 8 bits from a given <see cref="Register"/>.
+        /// </summary>
+        /// <param name="register">The <see cref="Register"/> to read from.</param>
+        /// <returns>Value from register.</returns>
+        private byte Read8Bits(Register register)
+        {
+            _i2cDevice.WriteByte((byte)register);
+
+            return _i2cDevice.ReadByte();
+        }
+
+        /// <summary>
+        /// Read 16 bits from a given <see cref="Register"/>.
+        /// </summary>
+        /// <param name="register">The <see cref="Register"/> to read from.</param>
+        /// <returns>Value from register.</returns>
+        private ushort Read16Bits(Register register)
+        {
+            Span<byte> bytes = stackalloc byte[2];
+
+            _i2cDevice.WriteByte((byte)register);
+            _i2cDevice.Read(bytes);
+
+            return BinaryPrimitives.ReadUInt16LittleEndian(bytes);
         }
 
         /// <summary>
