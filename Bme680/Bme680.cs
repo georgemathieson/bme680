@@ -118,7 +118,7 @@ namespace Bme680
             var temperatureFine = var1 + var2;
 
             // Compensated temperature data.
-            var calculatedTemperature = (temperatureFine / 5120.0f);
+            var calculatedTemperature = temperatureFine / 5120.0f;
 
             return Temperature.FromCelsius(calculatedTemperature);
         }
