@@ -22,6 +22,11 @@ namespace Bme680
         public const byte SecondaryI2cAddress = 0x77;
 
         /// <summary>
+        /// Calibration data specific to the device.
+        /// </summary>
+        private readonly CalibrationData _calibrationData = new CalibrationData();
+
+        /// <summary>
         /// The expected chip ID of the BME68x product family.
         /// </summary>
         private const byte _expectedChipId = 0x61;
@@ -57,6 +62,8 @@ namespace Bme680
                 throw new Bme680Exception(
                     $"Chip ID 0x{readChipId.ToString("X2")} is not the same as expected 0x{_expectedChipId.ToString("X2")}. Please check you are using the right device.");
             }
+
+            _calibrationData.ReadFromDevice(this);
         }
 
         /// <summary>
@@ -89,44 +96,29 @@ namespace Bme680
             _i2cDevice.Write(new[] { (byte)register, (byte)(cleared | (byte)oversampling << 5) });
         }
 
+        /// <summary>
+        /// Read the temperature data.
+        /// </summary>
+        /// <returns>Temperature read from the device.</returns>
         public Temperature ReadTemperature()
         {
-            // Read temperature calibration data.
-            ushort cal1 = Read16Bits(Register.cal_temp_1);
-            ushort cal2 = Read16Bits(Register.cal_temp_2);
-            byte cal3 = Read8Bits(Register.cal_temp_3);
-
-            Console.WriteLine($"cal1: {cal1}");
-            Console.WriteLine($"cal2: {cal2}");
-            Console.WriteLine($"cal3: {cal3}");
-
             // Read temperature data.
             byte msb = Read8Bits(Register.temp_msb);
             byte lsb = Read8Bits(Register.temp_lsb);
             byte xlsb = Read8Bits(Register.temp_xlsb);
 
-            Console.WriteLine($"msb: {msb}");
-            Console.WriteLine($"lsb: {lsb}");
-            Console.WriteLine($"xlsb: {xlsb}");
-
             // Convert to a 32bit integer.
             int adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
-            Console.WriteLine($"ADC Temperature: {adcTemperature}");
 
             // Calculate the temperature value in float format.
-            double var1 = ((adcTemperature / 16384.0) - (cal1 / 1024.0)) * cal2;
-            double var2 = ((adcTemperature / 131072.0) - (cal1 / 8192.0)) * cal3;
-            Console.WriteLine($"var1: {var1}");
-            Console.WriteLine($"var2: {var2}");
-
+            double var1 = ((adcTemperature / 16384.0) - (_calibrationData.TCal1 / 1024.0)) * _calibrationData.TCal2;
+            double var2 = ((adcTemperature / 131072.0) - (_calibrationData.TCal1 / 8192.0)) * _calibrationData.TCal3;
 
             // Temperature fine value.
             var temperatureFine = var1 + var2;
-            Console.WriteLine($"Temperature Fine: {temperatureFine}");
 
             // Compensated temperature data.
             var calculatedTemperature = temperatureFine / 5120.0;
-            Console.WriteLine($"Calculated Temperature: {calculatedTemperature}");
 
             return Temperature.FromCelsius(calculatedTemperature);
         }
@@ -136,7 +128,7 @@ namespace Bme680
         /// </summary>
         /// <param name="register">The <see cref="Register"/> to read from.</param>
         /// <returns>Value from register.</returns>
-        private byte Read8Bits(Register register)
+        internal byte Read8Bits(Register register)
         {
             _i2cDevice.WriteByte((byte)register);
 
@@ -148,7 +140,7 @@ namespace Bme680
         /// </summary>
         /// <param name="register">The <see cref="Register"/> to read from.</param>
         /// <returns>Value from register.</returns>
-        private ushort Read16Bits(Register register)
+        internal ushort Read16Bits(Register register)
         {
             Span<byte> bytes = stackalloc byte[2];
 
