@@ -29,7 +29,7 @@ namespace Bme680
         /// <summary>
         /// The expected chip ID of the BME68x product family.
         /// </summary>
-        private const byte _expectedChipId = 0x61;
+        private readonly byte _expectedChipId = 0x61;
 
         /// <summary>
         /// The communications channel to a device on an I2C bus.
