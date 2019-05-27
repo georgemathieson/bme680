@@ -26,16 +26,37 @@
         /// </remarks>
         Ctrl_meas = 0x74,
 
-        temp_xlsb = 0x24,
-
-        temp_lsb = 0x23,
-
+        /// <summary>
+        /// Register for retrieving the MSB part of the raw temperature measurement output data.
+        /// </summary>
         temp_msb = 0x22,
 
-        cal_temp_1 = 0xE9,
+        /// <summary>
+        /// Register for retrieving the LSB part of the raw temperature measurement output data.
+        /// </summary>
+        temp_lsb = 0x23,
 
-        cal_temp_2 = 0x8A,
+        /// <summary>
+        /// Register for retrieving the XLSB part of the raw temperature measurement output data.
+        /// </summary>
+        /// <remarks>
+        /// Contents depend on temperature resolution controlled by oversampling setting.
+        /// </remarks>
+        temp_xlsb = 0x24,
 
-        cal_temp_3 = 0x8C,
+        /// <summary>
+        /// Register for retrieving temperature calibration data.
+        /// </summary>
+        temp_cal_1 = 0xE9,
+
+        /// <summary>
+        /// Register for retrieving temperature calibration data.
+        /// </summary>
+        temp_cal_2 = 0x8A,
+
+        /// <summary>
+        /// Register for retrieving temperature calibration data.
+        /// </summary>
+        temp_cal_3 = 0x8C,
     }
 }
