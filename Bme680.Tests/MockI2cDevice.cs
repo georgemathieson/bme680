@@ -39,11 +39,6 @@ namespace Bme680.Tests
         public byte WriteByteCalledWithValue { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether or not the object has been disposed of.
-        /// </summary>
-        public bool Disposing { get; private set; }
-
-        /// <summary>
         /// Initializes new instance of <see cref="MockI2cDevice"/> class for use in tests.
         /// </summary>
         /// <param name="settings">The connection settings of a device on an I2C bus.</param>
@@ -92,11 +87,6 @@ namespace Bme680.Tests
         public override void WriteByte(byte value)
         {
             WriteByteCalledWithValue = value;
-        }
-
-        public override void Dispose(bool disposing)
-        {
-            Disposing = disposing;
         }
     }
 }
