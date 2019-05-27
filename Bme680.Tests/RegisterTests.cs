@@ -27,6 +27,22 @@ namespace Bme680.Tests
         }
 
         /// <summary>
+        /// Ensure that <see cref="Register.Ctrl_hum"/> is set to 0x72.
+        /// </summary>
+        [Fact]
+        public void Ctrl_hum_HasValue_0x72()
+        {
+            // Arrange.
+            byte expected = 0x72;
+
+            // Act.
+            var actual = (byte)Register.Ctrl_hum;
+
+            // Assert.
+            Assert.Equal(expected, actual);
+        }
+
+        /// <summary>
         /// Ensure that <see cref="Register.Ctrl_meas"/> is set to 0x74.
         /// </summary>
         [Fact]

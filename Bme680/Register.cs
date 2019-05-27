@@ -17,6 +17,14 @@
         Id = 0xD0,
 
         /// <summary>
+        /// Measurement control register for humidity.
+        /// </summary>
+        /// <remarks>
+        /// Bits 2 to 0.
+        /// </remarks>
+        Ctrl_hum = 0x72,
+
+        /// <summary>
         /// Measurement condition control register.
         /// </summary>
         /// <remarks>

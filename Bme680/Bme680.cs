@@ -67,6 +67,21 @@ namespace Bme680
         }
 
         /// <summary>
+        /// Set the humidity oversampling.
+        /// </summary>
+        /// <param name="oversampling">The <see cref="Oversampling"/> to set.</param>
+        public void SetHumidityOversampling(Oversampling oversampling)
+        {
+            var register = Register.Ctrl_hum;
+            byte read = Read8Bits(register);
+
+            // Clear first 3 bits.
+            var cleared = (byte)(read & 0b_1111_1000);
+
+            _i2cDevice.Write(new[] { (byte)register, (byte)(cleared | (byte)oversampling) });
+        }
+
+        /// <summary>
         /// Set the power mode.
         /// </summary>
         /// <param name="powerMode">The <see cref="PowerMode"/> to set.</param>
