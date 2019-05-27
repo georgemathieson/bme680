@@ -111,14 +111,14 @@ namespace Bme680
             int adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
 
             // Calculate the temperature value in float format.
-            double var1 = ((adcTemperature / 16384.0) - (_calibrationData.TCal1 / 1024.0)) * _calibrationData.TCal2;
-            double var2 = ((adcTemperature / 131072.0) - (_calibrationData.TCal1 / 8192.0)) * _calibrationData.TCal3;
+            float var1 = ((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2;
+            float var2 = ((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3;
 
             // Temperature fine value.
             var temperatureFine = var1 + var2;
 
             // Compensated temperature data.
-            var calculatedTemperature = temperatureFine / 5120.0;
+            var calculatedTemperature = (temperatureFine / 5120.0f);
 
             return Temperature.FromCelsius(calculatedTemperature);
         }
