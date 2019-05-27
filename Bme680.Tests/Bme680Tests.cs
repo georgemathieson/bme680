@@ -107,23 +107,6 @@ namespace Bme680.Tests
         }
 
         /// <summary>
-        /// On construction, ensure that <see cref="device.WriteByte(byte)"/> is called with the <see cref="Register.Id"/>.
-        /// </summary>
-        /// <remarks>
-        /// Act done in the test's constructor
-        /// </remarks>
-        [Fact]
-        public void Bme680_CallsWriteByte_WithRegisterId()
-        {
-            // Arrange.
-            var expected = (byte)Register.Id;
-            var actual = _mockI2cDevice.WriteByteCalledWithValue;
-
-            // Assert.
-            Assert.Equal(expected, actual);
-        }
-
-        /// <summary>
         /// On construction, if the chip ID does not match what is expected (0x61), then a <see cref="Bme680Exception"/> is thrown.
         /// </summary>
         [Fact]
@@ -205,52 +188,6 @@ namespace Bme680.Tests
 
             // Assert.
             Assert.Equal(expected, _mockI2cDevice.WriteCalledWithValue);
-        }
-
-        /// <summary>
-        /// Ensure that <see cref="IComDevice.Dispose()"/> is called when <see cref="Bme680.Dispose()"/> is called.
-        /// </summary>
-        [Fact]
-        public void Dispose_Calls_deviceDispose()
-        {
-            // Act.
-            _bme680.Dispose();
-
-            // Assert.
-            Assert.True(_mockI2cDevice.Disposing);
-        }
-
-        /// <summary>
-        /// Ensure that on calling <see cref="Bme680.Dispose()"/> that the <see cref="IComDevice"/> stored internally is set to null.
-        /// </summary>
-        [Fact]
-        public void Dispose_SetsComDevice_ToNull()
-        {
-            // Arrange.
-            var bindFlags = BindingFlags.Instance | BindingFlags.NonPublic;
-            var fieldInfo = typeof(Bme680).GetField("_i2cDevice", bindFlags);
-
-            // Act
-            _bme680.Dispose();
-
-            // Assert
-            Assert.Null(fieldInfo.GetValue(_bme680));
-        }
-
-        /// <summary>
-        /// A Dispose method should be callable multiple times without throwing an exception.
-        /// </summary>
-        [Fact]
-        public void Dispose_CalledMultipleTimes_ShouldNotThrow()
-        {
-            // Arrange by calling once.
-            _bme680.Dispose();
-
-            // Act by calling it again.
-            var result = Record.Exception(() => _bme680.Dispose());
-
-            // Assert.
-            Assert.Null(result);
         }
     }
 }
