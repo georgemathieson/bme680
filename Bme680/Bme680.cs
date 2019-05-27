@@ -110,17 +110,10 @@ namespace Bme680
             // Convert to a 32bit integer.
             int adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
 
-            // Calculate the temperature value in float format.
-            float var1 = ((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2;
-            float var2 = ((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3;
+            float temperature = (((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2) / 5120.0f;
+            float precision = (((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3) / 5120.0f;
 
-            // Temperature fine value.
-            var temperatureFine = var1 + var2;
-
-            // Compensated temperature data.
-            var calculatedTemperature = temperatureFine / 5120.0f;
-
-            return Temperature.FromCelsius(calculatedTemperature);
+            return Temperature.FromCelsius(temperature + precision);
         }
 
         /// <summary>
