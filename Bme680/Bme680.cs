@@ -67,14 +67,33 @@ namespace Bme680
         }
 
         /// <summary>
+        /// Get the <see cref="PowerMode"/> state.
+        /// </summary>
+        /// <returns>The current <see cref="PowerMode"/>.</returns>
+        public PowerMode GetPowerMode()
+        {
+            var register = Register.Ctrl_meas;
+            byte read = Read8Bits(register);
+
+            // Get only the power mode bits.
+            byte powerMode = (byte)(read & 0b_0000_0011);
+
+            return (PowerMode)powerMode;
+        }
+
+        /// <summary>
         /// Gets a value indicating whether or not new sensor data is available.
         /// </summary>
         /// <returns>True if new data is available.</returns>
         public bool HasNewData()
         {
-            int status = Read8Bits(Register.eas_status_0);
+            var register = Register.eas_status_0;
+            int read = Read8Bits(register);
 
-            return status == 1;
+            // Get only the power mode bits.
+            byte hasNewData = (byte)(read & 0b_1000_0000);
+
+            return (hasNewData >> 7) == 1;
         }
 
         /// <summary>
@@ -119,10 +138,10 @@ namespace Bme680
             byte xlsb = Read8Bits(Register.temp_xlsb);
 
             // Convert to a 32bit integer.
-            int adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
+            var adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
 
-            float temperature = (((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2) / 5120.0f;
-            float precision = (((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3) / 5120.0f;
+            var temperature = (((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2) / 5120.0f;
+            var precision = (((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3) / 5120.0f;
 
             return Temperature.FromCelsius(temperature + precision);
         }

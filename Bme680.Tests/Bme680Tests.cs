@@ -120,13 +120,48 @@ namespace Bme680.Tests
         }
 
         /// <summary>
+        /// Ensure the <see cref="Register.Ctrl_meas"/> is read from.
+        /// </summary>
+        [Fact]
+        public void GetPowerMode_CallsWriteByte_WithCorrectRegister()
+        {
+            // Act.
+            _bme680.GetPowerMode();
+
+            // Assert.
+            Assert.Equal((byte)Register.Ctrl_meas, _mockI2cDevice.WriteByteCalledWithValue);
+        }
+
+        /// <summary>
+        /// For each set <see cref="PowerMode"/>, ensure the correct value is returned.
+        /// </summary>
+        [Theory]
+        [InlineData(0b_0000_0000, PowerMode.Sleep)]
+        [InlineData(0b_1111_1100, PowerMode.Sleep)]
+        [InlineData(0b_0000_0001, PowerMode.Forced)]
+        [InlineData(0b_1111_1101, PowerMode.Forced)]
+        public void GetPowerMode_Returns_CorrectPowerMode(byte readBits, PowerMode expected)
+        {
+            // Arrange.
+            _mockI2cDevice.ReadByteSetupReturns = readBits;
+
+            // Act.
+            var actual = _bme680.GetPowerMode();
+
+            // Assert.
+            Assert.Equal(expected, actual);
+        }
+
+        /// <summary>
         /// Given a new data bit value, return the correct boolean value.
         /// </summary>
         /// <param name="readBits">A given byte containing the new data bit.</param>
         /// <param name="expected">The corresponding boolean value.</param>
         [Theory]
-        [InlineData(0b_0000_0000, false)]
-        [InlineData(0b_0000_0001, true)]
+        [InlineData(0b_000_0000, false)]
+        [InlineData(0b_0111_1111, false)]
+        [InlineData(0b_1000_0000, true)]
+        [InlineData(0b_1111_1111, true)]
         public void HasNewData_Returns_CorrectValue(byte readBits, bool expected)
         {
             // Arrange.
@@ -143,7 +178,7 @@ namespace Bme680.Tests
         /// Ensure the <see cref="Register.eas_status_0"/> is read from.
         /// </summary>
         [Fact]
-        public void HasNewData_ShouldCallRead8Bits_WithCorrectRegister()
+        public void HasNewData_CallsWriteByte_WithCorrectRegister()
         {
             // Act.
             _bme680.HasNewData();
@@ -152,7 +187,7 @@ namespace Bme680.Tests
         }
 
         [Fact]
-        public void SetPowerMode_CallsWriteByte_WithControlMeasurementRegister()
+        public void SetPowerMode_CallsWriteByte_WithCorrectRegister()
         {
             // Arrange.
             var expected = (byte)Register.Ctrl_meas;
@@ -187,7 +222,7 @@ namespace Bme680.Tests
         /// It should write the <see cref="Register.Ctrl_meas"/> register so the register value can be read from.
         /// </summary>
         [Fact]
-        public void SetTemperatureOversampling_CallsWriteByte_WithControlMeasurementRegister()
+        public void SetTemperatureOversampling_CallsWriteByte_WithCorrectRegister()
         {
             // Arrange.
             var expected = (byte)Register.Ctrl_meas;
