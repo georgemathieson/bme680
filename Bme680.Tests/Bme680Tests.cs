@@ -128,6 +128,7 @@ namespace Bme680.Tests
             // Act.
             _bme680.GetPowerMode();
 
+            // Assert.
             Assert.Equal((byte)Register.Ctrl_meas, _mockI2cDevice.WriteByteCalledWithValue);
         }
 
