@@ -67,6 +67,21 @@ namespace Bme680
         }
 
         /// <summary>
+        /// Get the <see cref="PowerMode"/> state.
+        /// </summary>
+        /// <returns>The current <see cref="PowerMode"/>.</returns>
+        public PowerMode GetPowerMode()
+        {
+            var register = Register.Ctrl_meas;
+            byte read = Read8Bits(register);
+
+            // Get only the power mode bits.
+            byte powerMode = (byte)(read & 0b_0000_0011);
+
+            return (PowerMode)powerMode;
+        }
+
+        /// <summary>
         /// Gets a value indicating whether or not new sensor data is available.
         /// </summary>
         /// <returns>True if new data is available.</returns>
