@@ -9,12 +9,9 @@
     public enum Register : byte
     {
         /// <summary>
-        /// Register for retrieving the chip ID of the device. 
+        /// Register for retrieving  status flags and index of measurement. 
         /// </summary>
-        /// <remarks>
-        /// Status register. This register is read-only.
-        /// </remarks>
-        Id = 0xD0,
+        eas_status_0 = 0x1D,
 
         /// <summary>
         /// Measurement control register for humidity.
@@ -35,22 +32,12 @@
         Ctrl_meas = 0x74,
 
         /// <summary>
-        /// Register for retrieving the MSB part of the raw temperature measurement output data.
-        /// </summary>
-        temp_msb = 0x22,
-
-        /// <summary>
-        /// Register for retrieving the LSB part of the raw temperature measurement output data.
-        /// </summary>
-        temp_lsb = 0x23,
-
-        /// <summary>
-        /// Register for retrieving the XLSB part of the raw temperature measurement output data.
+        /// Register for retrieving the chip ID of the device. 
         /// </summary>
         /// <remarks>
-        /// Contents depend on temperature resolution controlled by oversampling setting.
+        /// Status register. This register is read-only.
         /// </remarks>
-        temp_xlsb = 0x24,
+        Id = 0xD0,
 
         /// <summary>
         /// Register for retrieving temperature calibration data.
@@ -66,5 +53,23 @@
         /// Register for retrieving temperature calibration data.
         /// </summary>
         temp_cal_3 = 0x8C,
+
+        /// <summary>
+        /// Register for retrieving the LSB part of the raw temperature measurement output data.
+        /// </summary>
+        temp_lsb = 0x23,
+
+        /// <summary>
+        /// Register for retrieving the MSB part of the raw temperature measurement output data.
+        /// </summary>
+        temp_msb = 0x22,
+
+        /// <summary>
+        /// Register for retrieving the XLSB part of the raw temperature measurement output data.
+        /// </summary>
+        /// <remarks>
+        /// Contents depend on temperature resolution controlled by oversampling setting.
+        /// </remarks>
+        temp_xlsb = 0x24,
     }
 }
