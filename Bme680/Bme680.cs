@@ -72,9 +72,9 @@ namespace Bme680
         /// <returns>True if new data is available.</returns>
         public bool HasNewData()
         {
-            byte status = Read8Bits(Register.eas_status_0);
+            int status = Read8Bits(Register.eas_status_0);
 
-            return (status >> 7) != 0;
+            return status == 1;
         }
 
         /// <summary>
