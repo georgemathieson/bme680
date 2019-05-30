@@ -119,10 +119,10 @@ namespace Bme680
             byte xlsb = Read8Bits(Register.temp_xlsb);
 
             // Convert to a 32bit integer.
-            int adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
+            var adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
 
-            float temperature = (((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2) / 5120.0f;
-            float precision = (((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3) / 5120.0f;
+            var temperature = (((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2) / 5120.0f;
+            var precision = (((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3) / 5120.0f;
 
             return Temperature.FromCelsius(temperature + precision);
         }
