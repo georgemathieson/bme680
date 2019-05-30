@@ -67,6 +67,17 @@ namespace Bme680
         }
 
         /// <summary>
+        /// Gets a value indicating whether or not new sensor data is available.
+        /// </summary>
+        /// <returns>True if new data is available.</returns>
+        public bool HasNewData()
+        {
+            int status = Read8Bits(Register.eas_status_0);
+
+            return status == 1;
+        }
+
+        /// <summary>
         /// Set the power mode.
         /// </summary>
         /// <param name="powerMode">The <see cref="PowerMode"/> to set.</param>

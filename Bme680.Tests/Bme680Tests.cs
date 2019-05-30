@@ -119,6 +119,38 @@ namespace Bme680.Tests
             Assert.Throws<Bme680Exception>(() => new Bme680(_mockI2cDevice));
         }
 
+        /// <summary>
+        /// Given a new data bit value, return the correct boolean value.
+        /// </summary>
+        /// <param name="readBits">A given byte containing the new data bit.</param>
+        /// <param name="expected">The corresponding boolean value.</param>
+        [Theory]
+        [InlineData(0b_0000_0000, false)]
+        [InlineData(0b_0000_0001, true)]
+        public void HasNewData_Returns_CorrectValue(byte readBits, bool expected)
+        {
+            // Arrange.
+            _mockI2cDevice.ReadByteSetupReturns = readBits;
+
+            // Act.
+            var actual = _bme680.HasNewData();
+
+            // Assert.
+            Assert.Equal(expected, actual);
+        }
+
+        /// <summary>
+        /// Ensure the <see cref="Register.eas_status_0"/> is read from.
+        /// </summary>
+        [Fact]
+        public void HasNewData_ShouldCallRead8Bits_WithCorrectRegister()
+        {
+            // Act.
+            _bme680.HasNewData();
+
+            Assert.Equal((byte)Register.eas_status_0, _mockI2cDevice.WriteByteCalledWithValue);
+        }
+
         [Fact]
         public void SetPowerMode_CallsWriteByte_WithControlMeasurementRegister()
         {
