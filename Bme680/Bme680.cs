@@ -72,9 +72,13 @@ namespace Bme680
         /// <returns>True if new data is available.</returns>
         public bool HasNewData()
         {
-            int status = Read8Bits(Register.eas_status_0);
+            var register = Register.eas_status_0;
+            int read = Read8Bits(register);
 
-            return status == 1;
+            // Get only the power mode bits.
+            byte hasNewData = (byte)(read & 0b_0000_0011);
+
+            return hasNewData == 1;
         }
 
         /// <summary>

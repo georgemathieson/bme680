@@ -126,7 +126,9 @@ namespace Bme680.Tests
         /// <param name="expected">The corresponding boolean value.</param>
         [Theory]
         [InlineData(0b_0000_0000, false)]
+        [InlineData(0b_1111_1100, false)]
         [InlineData(0b_0000_0001, true)]
+        [InlineData(0b_1111_1101, true)]
         public void HasNewData_Returns_CorrectValue(byte readBits, bool expected)
         {
             // Arrange.
