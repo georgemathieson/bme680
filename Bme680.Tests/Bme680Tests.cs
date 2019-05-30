@@ -157,10 +157,10 @@ namespace Bme680.Tests
         /// <param name="readBits">A given byte containing the new data bit.</param>
         /// <param name="expected">The corresponding boolean value.</param>
         [Theory]
-        [InlineData(0b_0000_0000, false)]
-        [InlineData(0b_1111_1100, false)]
-        [InlineData(0b_0000_0001, true)]
-        [InlineData(0b_1111_1101, true)]
+        [InlineData(0b_000_0000, false)]
+        [InlineData(0b_0111_1111, false)]
+        [InlineData(0b_1000_0000, true)]
+        [InlineData(0b_1111_1111, true)]
         public void HasNewData_Returns_CorrectValue(byte readBits, bool expected)
         {
             // Arrange.

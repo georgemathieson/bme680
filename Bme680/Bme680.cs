@@ -91,9 +91,9 @@ namespace Bme680
             int read = Read8Bits(register);
 
             // Get only the power mode bits.
-            byte hasNewData = (byte)(read & 0b_0000_0011);
+            byte hasNewData = (byte)(read & 0b_1000_0000);
 
-            return hasNewData == 1;
+            return (hasNewData >> 7) == 1;
         }
 
         /// <summary>
