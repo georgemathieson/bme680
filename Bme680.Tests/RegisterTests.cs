@@ -8,22 +8,6 @@ namespace Bme680.Tests
     public class RegisterTests
     {
         /// <summary>
-        /// Ensure that <see cref="Register.eas_status_0"/> is set to 0x1D
-        /// </summary>
-        [Fact]
-        public void eas_status_0_HasValue_0x1D()
-        {
-            // Arrange.
-            byte expected = 0x1D;
-
-            // Act.
-            var actual = (byte)Register.eas_status_0;
-
-            // Assert.
-            Assert.Equal(expected, actual);
-        }
-
-        /// <summary>
         /// Ensure that <see cref="Register.Ctrl_hum"/> is set to 0x72.
         /// </summary>
         [Fact]
@@ -50,6 +34,22 @@ namespace Bme680.Tests
 
             // Act.
             var actual = (byte)Register.Ctrl_meas;
+
+            // Assert.
+            Assert.Equal(expected, actual);
+        }
+
+        /// <summary>
+        /// Ensure that <see cref="Register.eas_status_0"/> is set to 0x1D
+        /// </summary>
+        [Fact]
+        public void eas_status_0_HasValue_0x1D()
+        {
+            // Arrange.
+            byte expected = 0x1D;
+
+            // Act.
+            var actual = (byte)Register.eas_status_0;
 
             // Assert.
             Assert.Equal(expected, actual);

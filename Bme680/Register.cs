@@ -9,11 +9,6 @@
     public enum Register : byte
     {
         /// <summary>
-        /// Register for retrieving  status flags and index of measurement. 
-        /// </summary>
-        eas_status_0 = 0x1D,
-
-        /// <summary>
         /// Measurement control register for humidity.
         /// </summary>
         /// <remarks>
@@ -30,6 +25,11 @@
         /// Power mode (bits 1 to 0).
         /// </remarks>
         Ctrl_meas = 0x74,
+
+        /// <summary>
+        /// Register for retrieving  status flags and index of measurement. 
+        /// </summary>
+        eas_status_0 = 0x1D,
 
         /// <summary>
         /// Register for retrieving the chip ID of the device. 
