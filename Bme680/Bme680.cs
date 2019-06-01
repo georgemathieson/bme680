@@ -24,7 +24,7 @@ namespace Bme680
         /// <summary>
         /// Gets the humidity in %rH (percentage relative humidity).
         /// </summary>
-        public float Humidity => ReadHumidity();
+        public double Humidity => ReadHumidity();
 
         /// <summary>
         /// Gets the <see cref="PowerMode"/>.
@@ -194,35 +194,35 @@ namespace Bme680
         /// Read the humidity data.
         /// </summary>
         /// <returns>Calculated humidity.</returns>
-        private float ReadHumidity()
+        private double ReadHumidity()
         {
             // Read humidity data.
             byte msb = Read8Bits(Register.hum_msb);
             byte lsb = Read8Bits(Register.hum_lsb);
-            var temperature = (float)Temperature.Celsius;
+            var temperature = Temperature.Celsius;
             
             // Convert to a 32bit integer.
             var adcHumidity = (msb << 8) + lsb;
 
             // Calculate the humidity.
-            float var1 = adcHumidity - ((_calibrationData.HCal1 * 16.0f) + ((_calibrationData.HCal3 / 2.0f) * temperature));
+            var var1 = adcHumidity - ((_calibrationData.HCal1 * 16.0) + ((_calibrationData.HCal3 / 2.0) * temperature));
 
-            float var2 = var1 * ((_calibrationData.HCal2 / 262144.0f) * (1.0f + ((_calibrationData.HCal4 / 16384.0f)
-                * temperature) + ((_calibrationData.HCal5 / 1048576.0f) * temperature * temperature)));
+            var var2 = var1 * ((_calibrationData.HCal2 / 262144.0) * (1.0 + ((_calibrationData.HCal4 / 16384.0)
+                * temperature) + ((_calibrationData.HCal5 / 1048576.0) * temperature * temperature)));
 
-            float var3 = _calibrationData.HCal6 / 16384.0f;
+            var var3 = _calibrationData.HCal6 / 16384.0;
 
-            float var4 = _calibrationData.HCal7 / 2097152.0f;
+            var var4 = _calibrationData.HCal7 / 2097152.0;
 
-            float calculatedHumidity = var2 + ((var3 + (var4 * temperature)) * var2 * var2);
+            var calculatedHumidity = var2 + ((var3 + (var4 * temperature)) * var2 * var2);
 
-            if (calculatedHumidity > 100.0f)
+            if (calculatedHumidity > 100.0)
             {
-                calculatedHumidity = 100.0f;
+                calculatedHumidity = 100.0;
             }
-            else if (calculatedHumidity < 0.0f)
+            else if (calculatedHumidity < 0.0)
             {
-                calculatedHumidity = 0.0f;
+                calculatedHumidity = 0.0;
             }
 
             return calculatedHumidity;
@@ -242,10 +242,10 @@ namespace Bme680
             // Convert to a 32bit integer.
             var adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
 
-            var temperature = ((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2;
-            var precision = ((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3;
+            var temperature = ((adcTemperature / 16384.0) - (_calibrationData.TCal1 / 1024.0)) * _calibrationData.TCal2;
+            var precision = ((adcTemperature / 131072.0) - (_calibrationData.TCal1 / 8192.0)) * _calibrationData.TCal3;
 
-            return Temperature.FromCelsius((temperature + precision) / 5120f);
+            return Temperature.FromCelsius((temperature + precision) / 5120.0);
         }
 
         /// <summary>
