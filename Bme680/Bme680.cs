@@ -22,6 +22,11 @@ namespace Bme680
         public bool HasNewData => ReadHasNewData();
 
         /// <summary>
+        /// Gets the humidity in %rH (percentage relative humidity).
+        /// </summary>
+        public float Humidity => ReadHumidity();
+
+        /// <summary>
         /// Gets the <see cref="PowerMode"/>.
         /// </summary>
         public PowerMode PowerMode => ReadPowerMode();
@@ -67,8 +72,8 @@ namespace Bme680
             if (deviceAddress < DefaultI2cAddress || deviceAddress > SecondaryI2cAddress)
             {
                 throw new ArgumentOutOfRangeException(nameof(i2cDevice),
-                    $"Chip address 0x{deviceAddress.ToString("X2")} is out of range for a BME680. " +
-                    $"Expected 0x{DefaultI2cAddress.ToString("X2")} or 0x{SecondaryI2cAddress.ToString("X2")}");
+                    $@"Chip address 0x{deviceAddress.ToString("X2")} is out of range for a BME680. 
+                    Expected 0x{DefaultI2cAddress.ToString("X2")} or 0x{SecondaryI2cAddress.ToString("X2")}");
             }
 
             // Ensure the device exists on the I2C bus.
@@ -76,11 +81,26 @@ namespace Bme680
             if (readChipId != _expectedChipId)
             {
                 throw new Bme680Exception(
-                    $"Chip ID 0x{readChipId.ToString("X2")} is not the same as expected 0x{_expectedChipId.ToString("X2")}. " +
-                    "Please check you are using the right device.");
+                    $@"Chip ID 0x{readChipId.ToString("X2")} is not the same as expected 0x{_expectedChipId.ToString("X2")}. 
+                    Please check you are using the right device.");
             }
 
             _calibrationData.ReadFromDevice(this);
+        }
+
+        /// <summary>
+        /// Set the humidity oversampling.
+        /// </summary>
+        /// <param name="oversampling">The <see cref="Oversampling"/> to set.</param>
+        public void SetHumidityOversampling(Oversampling oversampling)
+        {
+            var register = Register.Ctrl_hum;
+            byte read = Read8Bits(register);
+
+            // Clear first 3 bits.
+            var cleared = (byte)(read & 0b_1111_1000);
+
+            _i2cDevice.Write(new[] { (byte)register, (byte)(cleared | (byte)oversampling) });
         }
 
         /// <summary>
@@ -171,9 +191,47 @@ namespace Bme680
         }
 
         /// <summary>
+        /// Read the humidity data.
+        /// </summary>
+        /// <returns>Calculated humidity.</returns>
+        private float ReadHumidity()
+        {
+            // Read humidity data.
+            byte msb = Read8Bits(Register.hum_msb);
+            byte lsb = Read8Bits(Register.hum_lsb);
+            var temperature = (float)Temperature.Celsius;
+            
+            // Convert to a 32bit integer.
+            var adcHumidity = (msb << 8) + lsb;
+
+            // Calculate the humidity.
+            float var1 = adcHumidity - ((_calibrationData.HCal1 * 16.0f) + ((_calibrationData.HCal3 / 2.0f) * temperature));
+
+            float var2 = var1 * ((_calibrationData.HCal2 / 262144.0f) * (1.0f + ((_calibrationData.HCal4 / 16384.0f)
+                * temperature) + ((_calibrationData.HCal5 / 1048576.0f) * temperature * temperature)));
+
+            float var3 = _calibrationData.HCal6 / 16384.0f;
+
+            float var4 = _calibrationData.HCal7 / 2097152.0f;
+
+            float calculatedHumidity = var2 + ((var3 + (var4 * temperature)) * var2 * var2);
+
+            if (calculatedHumidity > 100.0f)
+            {
+                calculatedHumidity = 100.0f;
+            }
+            else if (calculatedHumidity < 0.0f)
+            {
+                calculatedHumidity = 0.0f;
+            }
+
+            return calculatedHumidity;
+        }
+
+        /// <summary>
         /// Read the temperature data.
         /// </summary>
-        /// <returns>Temperature read from the device.</returns>
+        /// <returns>Calculated temperature.</returns>
         private Temperature ReadTemperature()
         {
             // Read temperature data.
@@ -184,10 +242,10 @@ namespace Bme680
             // Convert to a 32bit integer.
             var adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
 
-            var temperature = (((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2) / 5120.0f;
-            var precision = (((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3) / 5120.0f;
+            var temperature = ((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2;
+            var precision = ((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3;
 
-            return Temperature.FromCelsius(temperature + precision);
+            return Temperature.FromCelsius((temperature + precision) / 5120f);
         }
 
         /// <summary>

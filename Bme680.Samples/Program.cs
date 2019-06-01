@@ -25,6 +25,7 @@ namespace Bme680.Samples
 
             using (var bme680 = new Bme680(unixI2cDevice))
             {
+                bme680.SetHumidityOversampling(Oversampling.x1);
                 bme680.SetTemperatureOversampling(Oversampling.x2);
 
                 while (true)
@@ -39,9 +40,10 @@ namespace Bme680.Samples
                     // This prevent us from reading old data from the sensor.
                     if (bme680.HasNewData)
                     {
-                        var temperature = bme680.Temperature;
+                        var temperature = Math.Round(bme680.Temperature.Celsius, 2).ToString("N2");
+                        var humidity = Math.Round(bme680.Humidity, 2).ToString("N2");
 
-                        Console.WriteLine($"{Math.Round(temperature.Celsius, 2).ToString("N2")}°c");
+                        Console.WriteLine($"{temperature}°c {humidity}%rH");
 
                         Thread.Sleep(100);
                     }
