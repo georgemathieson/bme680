@@ -26,6 +26,6 @@ The following connection types are supported by this binding.
 The following sensors are supported by this binding.
 
 - [X] Temperature
-- [ ] Humidity
+- [X] Humidity
 - [ ] Pressure
 - [ ] Gas
