@@ -30,16 +30,16 @@ namespace Bme680.Samples
                 while (true)
                 {
                     // Once a reading has been taken, the sensor goes back to sleep mode.
-                    if (bme680.GetPowerMode() == PowerMode.Sleep)
+                    if (bme680.PowerMode == PowerMode.Sleep)
                     {
                         // This instructs the sensor to take a measurement.
                         bme680.SetPowerMode(PowerMode.Forced);
                     }
 
                     // This prevent us from reading old data from the sensor.
-                    if (bme680.HasNewData())
+                    if (bme680.HasNewData)
                     {
-                        var temperature = bme680.ReadTemperature();
+                        var temperature = bme680.Temperature;
 
                         Console.WriteLine($"{Math.Round(temperature.Celsius, 2).ToString("N2")}°c");
 

@@ -17,9 +17,24 @@ namespace Bme680
         public const byte DefaultI2cAddress = 0x76;
 
         /// <summary>
+        /// Gets a value indicating whether new data is available.
+        /// </summary>
+        public bool HasNewData => ReadHasNewData();
+
+        /// <summary>
+        /// Gets the <see cref="PowerMode"/>.
+        /// </summary>
+        public PowerMode PowerMode => ReadPowerMode();
+
+        /// <summary>
         /// Secondary I2C bus address.
         /// </summary>
         public const byte SecondaryI2cAddress = 0x77;
+
+        /// <summary>
+        /// Gets the <see cref="Temperature"/>.
+        /// </summary>
+        public Temperature Temperature => ReadTemperature();
 
         /// <summary>
         /// Calibration data specific to the device.
@@ -69,36 +84,6 @@ namespace Bme680
         }
 
         /// <summary>
-        /// Get the <see cref="PowerMode"/> state.
-        /// </summary>
-        /// <returns>The current <see cref="PowerMode"/>.</returns>
-        public PowerMode GetPowerMode()
-        {
-            var register = Register.Ctrl_meas;
-            byte read = Read8Bits(register);
-
-            // Get only the power mode bits.
-            var powerMode = (byte)(read & 0b_0000_0011);
-
-            return (PowerMode)powerMode;
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether or not new sensor data is available.
-        /// </summary>
-        /// <returns>True if new data is available.</returns>
-        public bool HasNewData()
-        {
-            var register = Register.eas_status_0;
-            int read = Read8Bits(register);
-
-            // Get only the power mode bit.
-            var hasNewData = (byte)(read & 0b_1000_0000);
-
-            return (hasNewData >> 7) == 1;
-        }
-
-        /// <summary>
         /// Set the power mode.
         /// </summary>
         /// <param name="powerMode">The <see cref="PowerMode"/> to set.</param>
@@ -129,26 +114,6 @@ namespace Bme680
         }
 
         /// <summary>
-        /// Read the temperature data.
-        /// </summary>
-        /// <returns>Temperature read from the device.</returns>
-        public Temperature ReadTemperature()
-        {
-            // Read temperature data.
-            byte msb = Read8Bits(Register.temp_msb);
-            byte lsb = Read8Bits(Register.temp_lsb);
-            byte xlsb = Read8Bits(Register.temp_xlsb);
-
-            // Convert to a 32bit integer.
-            var adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
-
-            var temperature = (((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2) / 5120.0f;
-            var precision = (((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3) / 5120.0f;
-
-            return Temperature.FromCelsius(temperature + precision);
-        }
-
-        /// <summary>
         /// Read 8 bits from a given <see cref="Register"/>.
         /// </summary>
         /// <param name="register">The <see cref="Register"/> to read from.</param>
@@ -173,6 +138,56 @@ namespace Bme680
             _i2cDevice.Read(bytes);
 
             return BinaryPrimitives.ReadUInt16LittleEndian(bytes);
+        }
+
+        /// <summary>
+        /// Read a value indicating whether or not new sensor data is available.
+        /// </summary>
+        /// <returns>True if new data is available.</returns>
+        private bool ReadHasNewData()
+        {
+            var register = Register.eas_status_0;
+            int read = Read8Bits(register);
+
+            // Get only the power mode bit.
+            var hasNewData = (byte)(read & 0b_1000_0000);
+
+            return (hasNewData >> 7) == 1;
+        }
+
+        /// <summary>
+        /// Read the <see cref="PowerMode"/> state.
+        /// </summary>
+        /// <returns>The current <see cref="PowerMode"/>.</returns>
+        private PowerMode ReadPowerMode()
+        {
+            var register = Register.Ctrl_meas;
+            byte read = Read8Bits(register);
+
+            // Get only the power mode bits.
+            var powerMode = (byte)(read & 0b_0000_0011);
+
+            return (PowerMode)powerMode;
+        }
+
+        /// <summary>
+        /// Read the temperature data.
+        /// </summary>
+        /// <returns>Temperature read from the device.</returns>
+        private Temperature ReadTemperature()
+        {
+            // Read temperature data.
+            byte msb = Read8Bits(Register.temp_msb);
+            byte lsb = Read8Bits(Register.temp_lsb);
+            byte xlsb = Read8Bits(Register.temp_xlsb);
+
+            // Convert to a 32bit integer.
+            var adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
+
+            var temperature = (((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2) / 5120.0f;
+            var precision = (((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3) / 5120.0f;
+
+            return Temperature.FromCelsius(temperature + precision);
         }
 
         /// <summary>

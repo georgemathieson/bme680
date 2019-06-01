@@ -126,7 +126,7 @@ namespace Bme680.Tests
         public void GetPowerMode_CallsWriteByte_WithCorrectRegister()
         {
             // Act.
-            _bme680.GetPowerMode();
+            var powerMode = _bme680.PowerMode;
 
             // Assert.
             Assert.Equal((byte)Register.Ctrl_meas, _mockI2cDevice.WriteByteCalledWithValue);
@@ -146,7 +146,7 @@ namespace Bme680.Tests
             _mockI2cDevice.ReadByteSetupReturns = readBits;
 
             // Act.
-            var actual = _bme680.GetPowerMode();
+            var actual = _bme680.PowerMode;
 
             // Assert.
             Assert.Equal(expected, actual);
@@ -168,7 +168,7 @@ namespace Bme680.Tests
             _mockI2cDevice.ReadByteSetupReturns = readBits;
 
             // Act.
-            var actual = _bme680.HasNewData();
+            var actual = _bme680.HasNewData;
 
             // Assert.
             Assert.Equal(expected, actual);
@@ -181,8 +181,9 @@ namespace Bme680.Tests
         public void HasNewData_CallsWriteByte_WithCorrectRegister()
         {
             // Act.
-            _bme680.HasNewData();
+            var hasNewData = _bme680.HasNewData;
 
+            // Assert.
             Assert.Equal((byte)Register.eas_status_0, _mockI2cDevice.WriteByteCalledWithValue);
         }
 
