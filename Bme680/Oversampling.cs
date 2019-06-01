@@ -1,7 +1,7 @@
 ﻿namespace Bme680
 {
     /// <summary>
-    /// Oversampling settings.
+    /// Oversampling settings used to control noise reduction.
     /// </summary>
     public enum Oversampling : byte
     {
