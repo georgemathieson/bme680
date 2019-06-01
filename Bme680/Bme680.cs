@@ -67,8 +67,8 @@ namespace Bme680
             if (deviceAddress < DefaultI2cAddress || deviceAddress > SecondaryI2cAddress)
             {
                 throw new ArgumentOutOfRangeException(nameof(i2cDevice),
-                    $"Chip address 0x{deviceAddress.ToString("X2")} is out of range for a BME680. " +
-                    $"Expected 0x{DefaultI2cAddress.ToString("X2")} or 0x{SecondaryI2cAddress.ToString("X2")}");
+                    $@"Chip address 0x{deviceAddress.ToString("X2")} is out of range for a BME680. 
+                    Expected 0x{DefaultI2cAddress.ToString("X2")} or 0x{SecondaryI2cAddress.ToString("X2")}");
             }
 
             // Ensure the device exists on the I2C bus.
@@ -76,8 +76,8 @@ namespace Bme680
             if (readChipId != _expectedChipId)
             {
                 throw new Bme680Exception(
-                    $"Chip ID 0x{readChipId.ToString("X2")} is not the same as expected 0x{_expectedChipId.ToString("X2")}. " +
-                    "Please check you are using the right device.");
+                    $@"Chip ID 0x{readChipId.ToString("X2")} is not the same as expected 0x{_expectedChipId.ToString("X2")}. 
+                    Please check you are using the right device.");
             }
 
             _calibrationData.ReadFromDevice(this);
