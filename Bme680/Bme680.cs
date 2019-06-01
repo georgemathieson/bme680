@@ -22,6 +22,11 @@ namespace Bme680
         public bool HasNewData => ReadHasNewData();
 
         /// <summary>
+        /// Gets the humidity in %rH (percentage relative humidity).
+        /// </summary>
+        public float Humidity => ReadHumidity();
+
+        /// <summary>
         /// Gets the <see cref="PowerMode"/>.
         /// </summary>
         public PowerMode PowerMode => ReadPowerMode();
@@ -186,9 +191,47 @@ namespace Bme680
         }
 
         /// <summary>
+        /// Read the humidity data.
+        /// </summary>
+        /// <returns>Calculated humidity.</returns>
+        private float ReadHumidity()
+        {
+            // Read humidity data.
+            byte msb = Read8Bits(Register.hum_msb);
+            byte lsb = Read8Bits(Register.hum_lsb);
+            var temperature = (float)Temperature.Celsius;
+            
+            // Convert to a 32bit integer.
+            var adcHumidity = (msb << 8) + lsb;
+
+            // Calculate the humidity.
+            float var1 = adcHumidity - ((_calibrationData.HCal1 * 16.0f) + ((_calibrationData.HCal3 / 2.0f) * temperature));
+
+            float var2 = var1 * ((_calibrationData.HCal2 / 262144.0f) * (1.0f + ((_calibrationData.HCal4 / 16384.0f)
+                * temperature) + ((_calibrationData.HCal5 / 1048576.0f) * temperature * temperature)));
+
+            float var3 = _calibrationData.HCal6 / 16384.0f;
+
+            float var4 = _calibrationData.HCal7 / 2097152.0f;
+
+            float calculatedHumidity = var2 + ((var3 + (var4 * temperature)) * var2 * var2);
+
+            if (calculatedHumidity > 100.0f)
+            {
+                calculatedHumidity = 100.0f;
+            }
+            else if (calculatedHumidity < 0.0f)
+            {
+                calculatedHumidity = 0.0f;
+            }
+
+            return calculatedHumidity;
+        }
+
+        /// <summary>
         /// Read the temperature data.
         /// </summary>
-        /// <returns>Temperature read from the device.</returns>
+        /// <returns>Calculated temperature.</returns>
         private Temperature ReadTemperature()
         {
             // Read temperature data.
