@@ -206,14 +206,10 @@ namespace Bme680
 
             // Calculate the humidity.
             var var1 = adcHumidity - ((_calibrationData.HCal1 * 16.0) + ((_calibrationData.HCal3 / 2.0) * temperature));
-
-            var var2 = var1 * ((_calibrationData.HCal2 / 262144.0) * (1.0 + ((_calibrationData.HCal4 / 16384.0)
-                * temperature) + ((_calibrationData.HCal5 / 1048576.0) * temperature * temperature)));
-
+            var var2 = var1 * ((_calibrationData.HCal2 / 262144.0) * (1.0 + ((_calibrationData.HCal4 / 16384.0) *temperature)
+                + ((_calibrationData.HCal5 / 1048576.0) * temperature * temperature)));
             var var3 = _calibrationData.HCal6 / 16384.0;
-
             var var4 = _calibrationData.HCal7 / 2097152.0;
-
             var calculatedHumidity = var2 + ((var3 + (var4 * temperature)) * var2 * var2);
 
             if (calculatedHumidity > 100.0)
