@@ -6,59 +6,59 @@
     public class CalibrationData
     {
         /// <summary>
-        /// Gets a temperature calibration value from <see cref="Register.temp_cal_1"/>.
+        /// Gets a temperature coefficient from <see cref="Register.temp_cal_1"/>.
         /// </summary>
         public ushort TCal1 { get; private set; }
 
         /// <summary>
-        /// Gets a temperature calibration value from <see cref="Register.temp_cal_2"/>.
+        /// Gets a temperature coefficient from <see cref="Register.temp_cal_2"/>.
         /// </summary>
         public ushort TCal2 { get; private set; }
 
         /// <summary>
-        /// Gets a temperature calibration value from <see cref="Register.temp_cal_3"/>
+        /// Gets a temperature coefficient from <see cref="Register.temp_cal_3"/>
         /// </summary>
         public byte TCal3 { get; private set; }
 
         /// <summary>
-        /// Gets a humidity calibration value from <see cref="Register.hum_cal_1_msb"/> and <see cref="Register.hum_cal_1_lsb"/>.
+        /// Gets a humidity coefficient from <see cref="Register.hum_cal_1_msb"/> and <see cref="Register.hum_cal_1_lsb"/>.
         /// </summary>
         public ushort HCal1 { get; private set; }
 
         /// <summary>
-        /// Gets a humidity calibration value from <see cref="Register.hum_cal_2_msb"/> and <see cref="Register.hum_cal_2_lsb"/>.
+        /// Gets a humidity coefficient from <see cref="Register.hum_cal_2_msb"/> and <see cref="Register.hum_cal_2_lsb"/>.
         /// </summary>
         public ushort HCal2 { get; private set; }
 
         /// <summary>
-        /// Gets a humidity calibration value from <see cref="Register.hum_cal_3"/>.
+        /// Gets a humidity coefficient from <see cref="Register.hum_cal_3"/>.
         /// </summary>
         public byte HCal3 { get; private set; }
 
         /// <summary>
-        /// Gets a humidity calibration value from <see cref="Register.hum_cal_4"/>.
+        /// Gets a humidity coefficient from <see cref="Register.hum_cal_4"/>.
         /// </summary>
         public byte HCal4 { get; private set; }
 
         /// <summary>
-        /// Gets a humidity calibration value from <see cref="Register.hum_cal_5"/>.
+        /// Gets a humidity coefficient from <see cref="Register.hum_cal_5"/>.
         /// </summary>
         public byte HCal5 { get; private set; }
 
         /// <summary>
-        /// Gets a humidity calibration value from <see cref="Register.hum_cal_6"/>.
+        /// Gets a humidity coefficient from <see cref="Register.hum_cal_6"/>.
         /// </summary>
         public byte HCal6 { get; private set; }
 
         /// <summary>
-        /// Gets a humidity calibration value from <see cref="Register.hum_cal_7"/>.
+        /// Gets a humidity coefficient from <see cref="Register.hum_cal_7"/>.
         /// </summary>
         public byte HCal7 { get; private set; }
 
         /// <summary>
-        /// Read calibration data from device.
+        /// Read coefficient data from device.
         /// </summary>
-        /// <param name="bme680">The <see cref="Bme680"/> to read calibration data from.</param>
+        /// <param name="bme680">The <see cref="Bme680"/> to read coefficient data from.</param>
         internal void ReadFromDevice(Bme680 bme680)
         {
             TCal1 = bme680.Read16Bits(Register.temp_cal_1);
