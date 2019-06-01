@@ -55,8 +55,6 @@ namespace Bme680.Tests
             Assert.Equal(expected, actual);
         }
 
-
-
         /// <summary>
         /// Ensure that <see cref="Register.hum_cal_1_lsb"/> is set to 0xE2.
         /// </summary>
