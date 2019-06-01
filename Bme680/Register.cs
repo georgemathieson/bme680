@@ -32,6 +32,61 @@
         eas_status_0 = 0x1D,
 
         /// <summary>
+        /// Register for retrieving humidity calibration data.
+        /// </summary>
+        hum_cal_1_lsb = 0xE2,
+
+        /// <summary>
+        /// Register for retrieving humidity calibration data.
+        /// </summary>
+        hum_cal_1_msb = 0xE3,
+
+        /// <summary>
+        /// Register for retrieving humidity calibration data.
+        /// </summary>
+        hum_cal_2_lsb = 0xE2,
+
+        /// <summary>
+        /// Register for retrieving humidity calibration data.
+        /// </summary>
+        hum_cal_2_msb = 0xE1,
+
+        /// <summary>
+        /// Register for retrieving humidity calibration data.
+        /// </summary>
+        hum_cal_3 = 0xE4,
+
+        /// <summary>
+        /// Register for retrieving humidity calibration data.
+        /// </summary>
+        hum_cal_4 = 0xE5,
+
+        /// <summary>
+        /// Register for retrieving humidity calibration data.
+        /// </summary>
+        hum_cal_5 = 0xE6,
+
+        /// <summary>
+        /// Register for retrieving humidity calibration data.
+        /// </summary>
+        hum_cal_6 = 0xE7,
+
+        /// <summary>
+        /// Register for retrieving humidity calibration data.
+        /// </summary>
+        hum_cal_7 = 0xE8,
+
+        /// <summary>
+        /// Register for retrieving the LSB part of the raw humidity measurement.
+        /// </summary>
+        hum_lsb = 0x26,
+
+        /// <summary>
+        /// Register for retrieving the MSB part of the raw humidity measurement.
+        /// </summary>
+        hum_msb = 0x25,
+
+        /// <summary>
         /// Register for retrieving the chip ID of the device. 
         /// </summary>
         /// <remarks>
@@ -55,17 +110,17 @@
         temp_cal_3 = 0x8C,
 
         /// <summary>
-        /// Register for retrieving the LSB part of the raw temperature measurement output data.
+        /// Register for retrieving the LSB part of the raw temperature measurement.
         /// </summary>
         temp_lsb = 0x23,
 
         /// <summary>
-        /// Register for retrieving the MSB part of the raw temperature measurement output data.
+        /// Register for retrieving the MSB part of the raw temperature measurement.
         /// </summary>
         temp_msb = 0x22,
 
         /// <summary>
-        /// Register for retrieving the XLSB part of the raw temperature measurement output data.
+        /// Register for retrieving the XLSB part of the raw temperature measurement.
         /// </summary>
         /// <remarks>
         /// Contents depend on temperature resolution controlled by oversampling setting.
