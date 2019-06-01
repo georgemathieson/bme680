@@ -199,12 +199,10 @@ namespace Bme680
             // Convert to a 32bit integer.
             var adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
 
-            var calTemperature = (((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2);
-            var calPrecision = (((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3);
-            var fineTemperature = calTemperature + calPrecision;
-            var celsius = fineTemperature / 5120.0f;
+            var temperature = (((adcTemperature / 16384.0f) - (_calibrationData.TCal1 / 1024.0f)) * _calibrationData.TCal2);
+            var precision = (((adcTemperature / 131072.0f) - (_calibrationData.TCal1 / 8192.0f)) * _calibrationData.TCal3);
 
-            return Temperature.FromCelsius(celsius);
+            return Temperature.FromCelsius((temperature + precision) / 5120f);
         }
 
         /// <summary>
