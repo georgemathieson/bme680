@@ -158,6 +158,9 @@ namespace Bme680
         /// </summary>
         /// <param name="register">The <see cref="Register"/> to read from.</param>
         /// <returns>Value from register.</returns>
+        /// <remarks>
+        /// Cast to an <see cref="sbyte"/> if you want to read a signed value.
+        /// </remarks>
         internal byte Read8Bits(Register register)
         {
             _i2cDevice.WriteByte((byte)register);
