@@ -32,6 +32,11 @@ namespace Bme680
         public PowerMode PowerMode => ReadPowerMode();
 
         /// <summary>
+        /// Get the pressure in Pa (Pascal).
+        /// </summary>
+        public double Pressure => ReadPressure();
+
+        /// <summary>
         /// Secondary I2C bus address.
         /// </summary>
         public const byte SecondaryI2cAddress = 0x77;
