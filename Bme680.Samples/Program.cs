@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Device.I2c;
 using System.Device.I2c.Drivers;
 using System.Threading;
@@ -27,6 +27,7 @@ namespace Bme680.Samples
             {
                 bme680.SetHumidityOversampling(Oversampling.x1);
                 bme680.SetTemperatureOversampling(Oversampling.x2);
+                bme680.SetPressureOversampling(Oversampling.x16);
 
                 while (true)
                 {
@@ -41,11 +42,12 @@ namespace Bme680.Samples
                     if (bme680.HasNewData)
                     {
                         var temperature = Math.Round(bme680.Temperature.Celsius, 2).ToString("N2");
+                        var pressure = Math.Round(bme680.Pressure / 100, 2).ToString("N2");
                         var humidity = Math.Round(bme680.Humidity, 2).ToString("N2");
 
-                        Console.WriteLine($"{temperature}°c {humidity}%rH");
+                        Console.WriteLine($"{temperature} °c | {pressure} hPa | {humidity} %rH");
 
-                        Thread.Sleep(100);
+                        Thread.Sleep(1000);
                     }
                 }
             }
