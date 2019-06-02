@@ -119,6 +119,21 @@ namespace Bme680
         }
 
         /// <summary>
+        /// Set the pressure oversampling.
+        /// </summary>
+        /// <param name="oversampling">The <see cref="Oversampling"/> value to set.</param>
+        public void SetPressureOversampling(Oversampling oversampling)
+        {
+            var register = Register.Ctrl_meas;
+            byte read = Read8Bits(register);
+
+            // Clear bits 4, 3 and 2.
+            var cleared = (byte)(read & 0b_1110_0011);
+
+            _i2cDevice.Write(new[] { (byte)register, (byte)(cleared | (byte)oversampling << 2) });
+        }
+
+        /// <summary>
         /// Set the temperature oversampling.
         /// </summary>
         /// <param name="oversampling">The <see cref="Oversampling"/> value to set.</param>
