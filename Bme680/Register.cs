@@ -93,6 +93,74 @@
         /// Status register. This register is read-only.
         /// </remarks>
         Id = 0xD0,
+        
+        /// <summary>
+        /// Register for retrieving pressure calibration data.
+        /// </summary>
+        pres_cal_1_lsb = 0x8E,
+
+        /// <summary>
+        /// Register for retrieving pressure calibration data.
+        /// </summary>
+        pres_cal_2_lsb = 0x90,
+
+        /// <summary>
+        /// Register for retrieving pressure calibration data.
+        /// </summary>
+        pres_cal_3 = 0x92,
+
+        /// <summary>
+        /// Register for retrieving pressure calibration data.
+        /// </summary>
+        pres_cal_4_lsb = 0x94,
+
+        /// <summary>
+        /// Register for retrieving pressure calibration data.
+        /// </summary>
+        pres_cal_5_lsb = 0x96,
+
+        /// <summary>
+        /// Register for retrieving pressure calibration data.
+        /// </summary>
+        pres_cal_7 = 0x98,
+
+        /// <summary>
+        /// Register for retrieving pressure calibration data.
+        /// </summary>
+        pres_cal_6 = 0x99,
+
+        /// <summary>
+        /// Register for retrieving pressure calibration data.
+        /// </summary>
+        pres_cal_8_lsb = 0x9C,
+
+        /// <summary>
+        /// Register for retrieving pressure calibration data.
+        /// </summary>
+        pres_cal_9_lsb = 0x9E,
+
+        /// <summary>
+        /// Register for retrieving pressure calibration data.
+        /// </summary>
+        pres_cal_10 = 0xA0,
+
+        /// <summary>
+        /// Register for retrieving the LSB part of the raw pressure measurement.
+        /// </summary>
+        pres_lsb = 0x20,
+
+        /// <summary>
+        /// Register for retrieving the MSB part of the raw pressure measurement.
+        /// </summary>
+        pres_msb = 0x1F,
+
+        /// <summary>
+        /// Register for retrieving the XLSB part of the raw pressure measurement.
+        /// </summary>
+        /// <remarks>
+        /// Contents depend on pressure resolution controlled by oversampling setting.
+        /// </remarks>
+        pres_xlsb = 0x21,
 
         /// <summary>
         /// Register for retrieving temperature calibration data.
