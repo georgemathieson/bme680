@@ -27,5 +27,5 @@ The following sensors are supported by this binding.
 
 - [X] Temperature
 - [X] Humidity
-- [ ] Pressure
+- [X] Pressure
 - [ ] Gas

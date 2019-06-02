@@ -186,12 +186,51 @@ namespace Bme680.Tests
             // Assert.
             Assert.Equal((byte)Register.eas_status_0, _mockI2cDevice.WriteByteCalledWithValue);
         }
-        
+
+        /// <summary>
+        /// It should write the <see cref="Register.Ctrl_meas"/> register so the register value can be read from.
+        /// </summary>
+        [Fact]
+        public void SetPressureOversampling_CallsWriteByte_WithCorrectRegister()
+        {
+            // Arrange.
+            var expected = (byte)Register.Ctrl_meas;
+
+            // Act.
+            _bme680.SetPressureOversampling(Oversampling.Skipped);
+
+            // Assert.
+            Assert.Equal(expected, _mockI2cDevice.WriteByteCalledWithValue);
+        }
+
+        /// <summary>
+        /// Given any state of read bits, the correct value the correct value should be written.
+        /// </summary>
+        /// <param name="readBits">The read bits to test with.</param>
+        [Theory]
+        [InlineData(0b_0000_0000)]
+        [InlineData(0b_1111_1111)]
+        public void SetPressureOversampling_CallsWrite_WithCorrectValue(byte readBits)
+        {
+            // Arrange.
+            _mockI2cDevice.ReadByteSetupReturns = readBits;
+            var oversampling = Oversampling.x2;
+            byte cleared = (byte)(readBits & 0b_1110_0011);
+            byte expectedBits = (byte)(cleared | ((byte)oversampling << 2));
+            byte[] expected = new[] { (byte)Register.Ctrl_meas, expectedBits };
+
+            // Act.
+            _bme680.SetPressureOversampling(oversampling);
+
+            // Assert.
+            Assert.Equal(expected, _mockI2cDevice.WriteCalledWithValue);
+        }
+
         /// <summary>
         /// It should write the <see cref="Register.Ctrl_hum"/> register so the register value can be read from.
         /// </summary>
         [Fact]
-        public void SetHumidityOversampling_CallsWriteByte_WithControlHumidityRegister()
+        public void SetHumidityOversampling_CallsWriteByte_WithCorrectRegister()
         {
             // Arrange.
             var expected = (byte)Register.Ctrl_hum;

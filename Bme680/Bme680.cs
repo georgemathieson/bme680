@@ -32,6 +32,11 @@ namespace Bme680
         public PowerMode PowerMode => ReadPowerMode();
 
         /// <summary>
+        /// Get the pressure in Pa (Pascal).
+        /// </summary>
+        public double Pressure => ReadPressure();
+
+        /// <summary>
         /// Secondary I2C bus address.
         /// </summary>
         public const byte SecondaryI2cAddress = 0x77;
@@ -119,6 +124,21 @@ namespace Bme680
         }
 
         /// <summary>
+        /// Set the pressure oversampling.
+        /// </summary>
+        /// <param name="oversampling">The <see cref="Oversampling"/> value to set.</param>
+        public void SetPressureOversampling(Oversampling oversampling)
+        {
+            var register = Register.Ctrl_meas;
+            byte read = Read8Bits(register);
+
+            // Clear bits 4, 3 and 2.
+            var cleared = (byte)(read & 0b_1110_0011);
+
+            _i2cDevice.Write(new[] { (byte)register, (byte)(cleared | (byte)oversampling << 2) });
+        }
+
+        /// <summary>
         /// Set the temperature oversampling.
         /// </summary>
         /// <param name="oversampling">The <see cref="Oversampling"/> value to set.</param>
@@ -138,6 +158,9 @@ namespace Bme680
         /// </summary>
         /// <param name="register">The <see cref="Register"/> to read from.</param>
         /// <returns>Value from register.</returns>
+        /// <remarks>
+        /// Cast to an <see cref="sbyte"/> if you want to read a signed value.
+        /// </remarks>
         internal byte Read8Bits(Register register)
         {
             _i2cDevice.WriteByte((byte)register);
@@ -146,18 +169,18 @@ namespace Bme680
         }
 
         /// <summary>
-        /// Read 16 bits from a given <see cref="Register"/>.
+        /// Read 16 bits from a given <see cref="Register"/> LSB first.
         /// </summary>
         /// <param name="register">The <see cref="Register"/> to read from.</param>
         /// <returns>Value from register.</returns>
-        internal ushort Read16Bits(Register register)
+        internal short Read16Bits(Register register)
         {
-            Span<byte> bytes = stackalloc byte[2];
+            Span<byte> buffer = stackalloc byte[2];
 
             _i2cDevice.WriteByte((byte)register);
-            _i2cDevice.Read(bytes);
+            _i2cDevice.Read(buffer);
 
-            return BinaryPrimitives.ReadUInt16LittleEndian(bytes);
+            return BinaryPrimitives.ReadInt16LittleEndian(buffer);
         }
 
         /// <summary>
@@ -206,14 +229,10 @@ namespace Bme680
 
             // Calculate the humidity.
             var var1 = adcHumidity - ((_calibrationData.HCal1 * 16.0) + ((_calibrationData.HCal3 / 2.0) * temperature));
-
-            var var2 = var1 * ((_calibrationData.HCal2 / 262144.0) * (1.0 + ((_calibrationData.HCal4 / 16384.0)
-                * temperature) + ((_calibrationData.HCal5 / 1048576.0) * temperature * temperature)));
-
+            var var2 = var1 * ((_calibrationData.HCal2 / 262144.0) * (1.0 + ((_calibrationData.HCal4 / 16384.0) *temperature)
+                + ((_calibrationData.HCal5 / 1048576.0) * temperature * temperature)));
             var var3 = _calibrationData.HCal6 / 16384.0;
-
             var var4 = _calibrationData.HCal7 / 2097152.0;
-
             var calculatedHumidity = var2 + ((var3 + (var4 * temperature)) * var2 * var2);
 
             if (calculatedHumidity > 100.0)
@@ -229,14 +248,55 @@ namespace Bme680
         }
 
         /// <summary>
+        /// Read the pressure data in Pa (Pascal).
+        /// </summary>
+        /// <returns>Calculated pressure.</returns>
+        private Double ReadPressure()
+        {
+            // Read pressure data.
+            byte lsb = Read8Bits(Register.pres_lsb);
+            byte msb = Read8Bits(Register.pres_msb);
+            byte xlsb = Read8Bits(Register.pres_xlsb);
+
+            // Convert to a 32bit integer.
+            var adcPressure = (msb << 12) + (lsb << 4) + (xlsb >> 4);
+
+            // Calculate the pressure.
+            var var1 = (Temperature.Celsius * 5120.0 / 2.0) - 64000.0;
+            var var2 = var1 * var1 * (_calibrationData.PCal6 / 131072.0);
+            var2 += (var1 * _calibrationData.PCal5 * 2.0);
+            var2 = (var2 / 4.0) + (_calibrationData.PCal4 * 65536.0);
+            var1 = ((_calibrationData.PCal3 * var1 * var1 / 16384.0) + (_calibrationData.PCal2 * var1)) / 524288.0;
+            var1 = (1.0 + (var1 / 32768.0)) * _calibrationData.PCal1;
+            var calculatedPressure = 1048576.0 - adcPressure;
+
+            // Avoid exception caused by division by zero.
+            if (var1 != 0)
+            {
+                calculatedPressure = (calculatedPressure - (var2 / 4096.0)) * 6250.0 / var1;
+                var1 = _calibrationData.PCal9 * calculatedPressure * calculatedPressure / 2147483648.0;
+                var2 = calculatedPressure * (_calibrationData.PCal8 / 32768.0);
+                var var3 = (calculatedPressure / 256.0) * (calculatedPressure / 256.0) * (calculatedPressure / 256.0)
+                    * (_calibrationData.PCal10 / 131072.0);
+                calculatedPressure += (var1 + var2 + var3 + (_calibrationData.PCal7 * 128.0)) / 16.0;
+            }
+            else
+            {
+                calculatedPressure = 0;
+            }
+
+            return calculatedPressure;
+        }
+
+        /// <summary>
         /// Read the temperature data.
         /// </summary>
         /// <returns>Calculated temperature.</returns>
         private Temperature ReadTemperature()
         {
             // Read temperature data.
-            byte msb = Read8Bits(Register.temp_msb);
             byte lsb = Read8Bits(Register.temp_lsb);
+            byte msb = Read8Bits(Register.temp_msb);
             byte xlsb = Read8Bits(Register.temp_xlsb);
 
             // Convert to a 32bit integer.
