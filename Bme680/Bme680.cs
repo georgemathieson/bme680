@@ -251,7 +251,7 @@ namespace Bme680
         /// Read the pressure data in Pa (Pascal).
         /// </summary>
         /// <returns>Calculated pressure.</returns>
-        private Double ReadPressure()
+        private double ReadPressure()
         {
             // Read pressure data.
             byte lsb = Read8Bits(Register.pres_lsb);
