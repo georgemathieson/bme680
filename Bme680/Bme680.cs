@@ -166,18 +166,18 @@ namespace Bme680
         }
 
         /// <summary>
-        /// Read 16 bits from a given <see cref="Register"/>.
+        /// Read 16 bits from a given <see cref="Register"/> LSB first.
         /// </summary>
         /// <param name="register">The <see cref="Register"/> to read from.</param>
         /// <returns>Value from register.</returns>
-        internal ushort Read16Bits(Register register)
+        internal short Read16Bits(Register register)
         {
-            Span<byte> bytes = stackalloc byte[2];
+            Span<byte> buffer = stackalloc byte[2];
 
             _i2cDevice.WriteByte((byte)register);
-            _i2cDevice.Read(bytes);
+            _i2cDevice.Read(buffer);
 
-            return BinaryPrimitives.ReadUInt16LittleEndian(bytes);
+            return BinaryPrimitives.ReadInt16LittleEndian(buffer);
         }
 
         /// <summary>
