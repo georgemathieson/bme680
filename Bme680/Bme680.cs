@@ -1,6 +1,7 @@
 using System;
 using System.Buffers.Binary;
 using System.Device.I2c;
+using System.IO;
 using System.Threading.Tasks;
 using Iot.Units;
 
@@ -77,17 +78,14 @@ namespace Bme680
             if (deviceAddress < DefaultI2cAddress || deviceAddress > SecondaryI2cAddress)
             {
                 throw new ArgumentOutOfRangeException(nameof(i2cDevice),
-                    $@"Chip address 0x{deviceAddress.ToString("X2")} is out of range for a BME680. 
-                    Expected 0x{DefaultI2cAddress.ToString("X2")} or 0x{SecondaryI2cAddress.ToString("X2")}");
+                    $"Chip address {deviceAddress} is out of range for a BME680. Expected {DefaultI2cAddress} or {SecondaryI2cAddress}");
             }
 
             // Ensure the device exists on the I2C bus.
             byte readChipId = Read8Bits(Register.Id);
             if (readChipId != _expectedChipId)
             {
-                throw new Bme680Exception(
-                    $@"Chip ID 0x{readChipId.ToString("X2")} is not the same as expected 0x{_expectedChipId.ToString("X2")}. 
-                    Please check you are using the right device.");
+                throw new IOException($"Unable to find a chip with id {_expectedChipId}");
             }
 
             _calibrationData.ReadFromDevice(this);
@@ -190,7 +188,7 @@ namespace Bme680
         private bool ReadHasNewData()
         {
             var register = Register.eas_status_0;
-            int read = Read8Bits(register);
+            byte read = Read8Bits(register);
 
             // Get only the power mode bit.
             var hasNewData = (byte)(read & 0b_1000_0000);
@@ -223,7 +221,7 @@ namespace Bme680
             byte msb = Read8Bits(Register.hum_msb);
             byte lsb = Read8Bits(Register.hum_lsb);
             var temperature = Temperature.Celsius;
-            
+
             // Convert to a 32bit integer.
             var adcHumidity = (msb << 8) + lsb;
 
@@ -302,6 +300,7 @@ namespace Bme680
             // Convert to a 32bit integer.
             var adcTemperature = (msb << 12) + (lsb << 4) + (xlsb >> 4);
 
+            // Calculate the temperature.
             var var1 = ((adcTemperature / 16384.0) - (_calibrationData.TCal1 / 1024.0)) * _calibrationData.TCal2;
             var var2 = ((adcTemperature / 131072.0) - (_calibrationData.TCal1 / 8192.0)) * _calibrationData.TCal3;
 

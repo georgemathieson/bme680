@@ -1,5 +1,6 @@
 using System;
 using System.Device.I2c;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Xunit;
@@ -116,7 +117,7 @@ namespace Bme680.Tests
             _mockI2cDevice.ReadByteSetupReturns = default;
 
             // Act and Assert.
-            Assert.Throws<Bme680Exception>(() => new Bme680(_mockI2cDevice));
+            Assert.Throws<IOException>(() => new Bme680(_mockI2cDevice));
         }
 
         /// <summary>

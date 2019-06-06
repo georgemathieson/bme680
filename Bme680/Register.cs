@@ -27,7 +27,7 @@
         Ctrl_meas = 0x74,
 
         /// <summary>
-        /// Register for retrieving  status flags and index of measurement. 
+        /// Register for retrieving  status flags and index of measurement.
         /// </summary>
         eas_status_0 = 0x1D,
 
@@ -87,13 +87,13 @@
         hum_msb = 0x25,
 
         /// <summary>
-        /// Register for retrieving the chip ID of the device. 
+        /// Register for retrieving the chip ID of the device.
         /// </summary>
         /// <remarks>
         /// Status register. This register is read-only.
         /// </remarks>
         Id = 0xD0,
-        
+
         /// <summary>
         /// Register for retrieving pressure calibration data.
         /// </summary>
