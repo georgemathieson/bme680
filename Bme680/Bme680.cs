@@ -78,7 +78,7 @@ namespace Bme680
             if (deviceAddress < DefaultI2cAddress || deviceAddress > SecondaryI2cAddress)
             {
                 throw new ArgumentOutOfRangeException(nameof(i2cDevice),
-                    $"Chip address {deviceAddress} is out of range for a BME680. Expected {DefaultI2cAddress} or {SecondaryI2cAddress}");
+                    $"Device address {deviceAddress} is out of range. Expected {DefaultI2cAddress} or {SecondaryI2cAddress}");
             }
 
             // Ensure the device exists on the I2C bus.
