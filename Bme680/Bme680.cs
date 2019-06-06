@@ -212,7 +212,7 @@ namespace Bme680
         }
 
         /// <summary>
-        /// Read the humidity data.
+        /// Read the humidity.
         /// </summary>
         /// <returns>Calculated humidity.</returns>
         private double ReadHumidity()
@@ -246,7 +246,7 @@ namespace Bme680
         }
 
         /// <summary>
-        /// Read the pressure data in Pa (Pascal).
+        /// Read the pressure.
         /// </summary>
         /// <returns>Calculated pressure.</returns>
         private double ReadPressure()
@@ -287,7 +287,7 @@ namespace Bme680
         }
 
         /// <summary>
-        /// Read the temperature data.
+        /// Read the temperature.
         /// </summary>
         /// <returns>Calculated temperature.</returns>
         private Temperature ReadTemperature()
