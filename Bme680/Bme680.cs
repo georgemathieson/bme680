@@ -68,7 +68,7 @@ namespace Bme680
         /// <param name="i2cDevice">The <see cref="I2cDevice"/> to create with.</param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="Bme680Exception"></exception>
+        /// <exception cref="IOException"></exception>
         public Bme680(I2cDevice i2cDevice)
         {
             _i2cDevice = i2cDevice ?? throw new ArgumentNullException(nameof(i2cDevice));

@@ -75,7 +75,7 @@ namespace Bme680.Tests
         }
 
         /// <summary>
-        /// On construction, ensure that an <see cref="ArgumentNullException"/> is thrown if 
+        /// On construction, ensure that an <see cref="ArgumentNullException"/> is thrown if
         /// <see cref="Bme680.Bme680(IComDevice)"/> is called with a null <see cref="IComDevice"/>.
         /// </summary>
         [Fact]
@@ -108,10 +108,10 @@ namespace Bme680.Tests
         }
 
         /// <summary>
-        /// On construction, if the chip ID does not match what is expected (0x61), then a <see cref="Bme680Exception"/> is thrown.
+        /// On construction, if the chip ID does not match what is expected (0x61), then a <see cref="IOException"/> is thrown.
         /// </summary>
         [Fact]
-        public void Bme680_WrongChipId_ThrowsBme680Exception()
+        public void Bme680_WrongChipId_ThrowsIOException()
         {
             // Arrange.
             _mockI2cDevice.ReadByteSetupReturns = default;
@@ -266,6 +266,9 @@ namespace Bme680.Tests
             Assert.Equal(expected, _mockI2cDevice.WriteCalledWithValue);
         }
 
+        /// <summary>
+        /// Ensure setting the power mode calls write byte with the correct register.
+        /// </summary>
         [Fact]
         public void SetPowerMode_CallsWriteByte_WithCorrectRegister()
         {
@@ -279,6 +282,10 @@ namespace Bme680.Tests
             Assert.Equal(expected, _mockI2cDevice.WriteByteCalledWithValue);
         }
 
+        /// <summary>
+        /// Given any state of read bits, the correct value the correct value should be written.
+        /// </summary>
+        /// <param name="readBits">The read bits to test with.</param>
         [Theory]
         [InlineData(0b_0000_0000)]
         [InlineData(0b_1111_1111)]
