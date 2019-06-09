@@ -189,7 +189,24 @@ namespace Bme680.Tests
         }
 
         /// <summary>
-        /// It should write the <see cref="Register.Ctrl_meas"/> register so the register value can be read from.
+        /// It should write the reset value to the register.
+        /// </summary>
+        [Fact]
+        public void Reset_CallsWriteByte_WithCorrectRegister()
+        {
+            // Arrange.
+            byte expectedBits = 0xB6;
+            byte[] expected = new[] { (byte)Register.Reset, expectedBits };
+
+            // Act.
+            _bme680.Reset();
+
+            // Assert.
+            Assert.Equal(expected, _mockI2cDevice.WriteCalledWithValue);
+        }
+
+        /// <summary>
+        /// It should write the <see cref="Register.Ctrl_meas"/> so the register value can be read from.
         /// </summary>
         [Fact]
         public void SetPressureOversampling_CallsWriteByte_WithCorrectRegister()
