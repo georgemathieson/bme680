@@ -163,6 +163,11 @@
         pres_xlsb = 0x21,
 
         /// <summary>
+        /// Register used to reset the device.
+        /// </summary>
+        Reset = 0xE0,
+
+        /// <summary>
         /// Register for retrieving temperature calibration data.
         /// </summary>
         temp_cal_1 = 0xE9,
