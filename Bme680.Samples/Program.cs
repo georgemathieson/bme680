@@ -25,6 +25,7 @@ namespace Bme680.Samples
 
             using (var bme680 = new Bme680(unixI2cDevice))
             {
+                bme680.Reset();
                 bme680.SetHumidityOversampling(Oversampling.x1);
                 bme680.SetTemperatureOversampling(Oversampling.x2);
                 bme680.SetPressureOversampling(Oversampling.x16);

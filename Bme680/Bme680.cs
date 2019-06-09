@@ -92,6 +92,16 @@ namespace Bme680
         }
 
         /// <summary>
+        /// Reset the device.
+        /// </summary>
+        public void Reset()
+        {
+            byte resetValue = 0xB6;
+
+            _i2cDevice.Write(new[] { (byte)Register.Reset, resetValue });
+        }
+
+        /// <summary>
         /// Set the humidity oversampling.
         /// </summary>
         /// <param name="oversampling">The <see cref="Oversampling"/> to set.</param>
