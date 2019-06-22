@@ -8,9 +8,9 @@ namespace Bme680.Samples
     public class Options
     {
         /// <summary>
-        /// Gets or sets the format to use when writing readings to the console.
+        /// Gets or sets whether output should be formatted as JSON.
         /// </summary>
-        [Option('f', "format", Default = "text", HelpText = "Set format of output (text, json)")]
-        public string Format { get; set; }
+        [Option('j', "json", Default = false, HelpText = "Output readings as JSON")]
+        public bool JsonOutput { get; set; }
     }
 }

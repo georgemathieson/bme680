@@ -63,14 +63,13 @@ namespace Bme680.Samples
                             Humidity = Math.Round(bme680.Humidity, 2).ToString("N2")
                         };
 
-                        switch(_options.Format)
+                        if(_options.JsonOutput)
                         {
-                            case "text":
-                                Console.WriteLine($"{reading.Temperature} °c | {reading.Pressure} hPa | {reading.Humidity} %rH");
-                                break;
-                            case "json":
-                                Console.WriteLine(JsonConvert.SerializeObject(reading));
-                                break;
+                            Console.WriteLine(JsonConvert.SerializeObject(reading));
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{reading.Temperature} °c | {reading.Pressure} hPa | {reading.Humidity} %rH");
                         }
 
                         Thread.Sleep(1000);
