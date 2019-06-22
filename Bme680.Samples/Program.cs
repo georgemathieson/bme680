@@ -1,4 +1,5 @@
 using CommandLine;
+using Newtonsoft.Json;
 using System;
 using System.Device.I2c;
 using System.Device.I2c.Drivers;
@@ -62,7 +63,15 @@ namespace Bme680.Samples
                             Humidity = Math.Round(bme680.Humidity, 2).ToString("N2")
                         };
 
-                        Console.WriteLine($"{reading.Temperature} °c | {reading.Pressure} hPa | {reading.Humidity} %rH");
+                        switch(_options.Format)
+                        {
+                            case "text":
+                                Console.WriteLine($"{reading.Temperature} °c | {reading.Pressure} hPa | {reading.Humidity} %rH");
+                                break;
+                            case "json":
+                                Console.WriteLine(JsonConvert.SerializeObject(reading));
+                                break;
+                        }
 
                         Thread.Sleep(1000);
                     }
