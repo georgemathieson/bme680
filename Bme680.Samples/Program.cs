@@ -30,7 +30,10 @@ namespace Bme680.Samples
                 return -1;
             }
 
-            Console.WriteLine("Hello BME680!");
+            if(_options.Quiet == false)
+            {
+                Console.WriteLine("Hello BME680!");
+            }
 
             // The I2C bus ID on the Raspberry Pi 3.
             const int busId = 1;

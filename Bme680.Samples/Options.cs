@@ -12,5 +12,11 @@ namespace Bme680.Samples
         /// </summary>
         [Option('j', "json", Default = false, HelpText = "Output readings as JSON")]
         public bool JsonOutput { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether any non-reading output should be suppressed.
+        /// </summary>
+        [Option('q', "quiet", Default = false, HelpText = "Suppresses non-reading output")]
+        public bool Quiet { get; set; }
     }
 }
