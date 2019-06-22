@@ -42,11 +42,14 @@ namespace Bme680.Samples
                     // This prevent us from reading old data from the sensor.
                     if (bme680.HasNewData)
                     {
-                        var temperature = Math.Round(bme680.Temperature.Celsius, 2).ToString("N2");
-                        var pressure = Math.Round(bme680.Pressure / 100, 2).ToString("N2");
-                        var humidity = Math.Round(bme680.Humidity, 2).ToString("N2");
+                        var reading = new
+                        {
+                            Temperature = Math.Round(bme680.Temperature.Celsius, 2).ToString("N2"),
+                            Pressure = Math.Round(bme680.Pressure / 100, 2).ToString("N2"),
+                            Humidity = Math.Round(bme680.Humidity, 2).ToString("N2")
+                        };
 
-                        Console.WriteLine($"{temperature} °c | {pressure} hPa | {humidity} %rH");
+                        Console.WriteLine($"{reading.Temperature} °c | {reading.Pressure} hPa | {reading.Humidity} %rH");
 
                         Thread.Sleep(1000);
                     }
