@@ -22,6 +22,7 @@ namespace Bme680.Samples
         /// </summary>
         static int Main(string[] args)
         {
+            // Parse options passed from the command line.
             var parseResult = Parser.Default.ParseArguments<Options>(args).WithParsed(options => _options = options);
             if (parseResult is NotParsed<Options>)
             {
