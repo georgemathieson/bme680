@@ -1,3 +1,4 @@
+using CommandLine;
 using System;
 using System.Device.I2c;
 using System.Device.I2c.Drivers;
@@ -11,10 +12,22 @@ namespace Bme680.Samples
     public static class Program
     {
         /// <summary>
+        /// CLI options the program was called with.
+        /// </summary>
+        private static Options _options;
+
+        /// <summary>
         /// Main entry point for the program.
         /// </summary>
-        static void Main()
+        static int Main(string[] args)
         {
+            var parseResult = Parser.Default.ParseArguments<Options>(args).WithParsed(options => _options = options);
+            if (parseResult is NotParsed<Options>)
+            {
+                // Invalid options passed to program, exit with non-ok status code.
+                return -1;
+            }
+
             Console.WriteLine("Hello BME680!");
 
             // The I2C bus ID on the Raspberry Pi 3.
