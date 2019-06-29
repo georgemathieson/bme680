@@ -1,9 +1,9 @@
-using CommandLine;
-using Newtonsoft.Json;
 using System;
 using System.Device.I2c;
 using System.Device.I2c.Drivers;
 using System.Threading;
+using CommandLine;
+using Newtonsoft.Json;
 
 namespace Bme680.Samples
 {
