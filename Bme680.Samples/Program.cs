@@ -2,6 +2,8 @@ using System;
 using System.Device.I2c;
 using System.Device.I2c.Drivers;
 using System.Threading;
+using CommandLine;
+using Newtonsoft.Json;
 
 namespace Bme680.Samples
 {
@@ -11,11 +13,27 @@ namespace Bme680.Samples
     public static class Program
     {
         /// <summary>
+        /// CLI options the program was called with.
+        /// </summary>
+        private static Options _options;
+
+        /// <summary>
         /// Main entry point for the program.
         /// </summary>
-        static void Main()
+        static int Main(string[] args)
         {
-            Console.WriteLine("Hello BME680!");
+            // Parse options passed from the command line.
+            var parseResult = Parser.Default.ParseArguments<Options>(args).WithParsed(options => _options = options);
+            if (parseResult is NotParsed<Options>)
+            {
+                // Invalid options passed to program, exit with non-ok status code.
+                return -1;
+            }
+
+            if (_options.Quiet == false)
+            {
+                Console.WriteLine("Hello BME680!");
+            }
 
             // The I2C bus ID on the Raspberry Pi 3.
             const int busId = 1;
@@ -42,11 +60,21 @@ namespace Bme680.Samples
                     // This prevent us from reading old data from the sensor.
                     if (bme680.HasNewData)
                     {
-                        var temperature = Math.Round(bme680.Temperature.Celsius, 2).ToString("N2");
-                        var pressure = Math.Round(bme680.Pressure / 100, 2).ToString("N2");
-                        var humidity = Math.Round(bme680.Humidity, 2).ToString("N2");
+                        var reading = new
+                        {
+                            Temperature = Math.Round(bme680.Temperature.Celsius, 2).ToString("N2"),
+                            Pressure = Math.Round(bme680.Pressure / 100, 2).ToString("N2"),
+                            Humidity = Math.Round(bme680.Humidity, 2).ToString("N2")
+                        };
 
-                        Console.WriteLine($"{temperature} °c | {pressure} hPa | {humidity} %rH");
+                        if (_options.JsonOutput)
+                        {
+                            Console.WriteLine(JsonConvert.SerializeObject(reading));
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{reading.Temperature} °c | {reading.Pressure} hPa | {reading.Humidity} %rH");
+                        }
 
                         Thread.Sleep(1000);
                     }
