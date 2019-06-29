@@ -30,7 +30,7 @@ namespace Bme680.Samples
                 return -1;
             }
 
-            if(_options.Quiet == false)
+            if (_options.Quiet == false)
             {
                 Console.WriteLine("Hello BME680!");
             }
@@ -67,7 +67,7 @@ namespace Bme680.Samples
                             Humidity = Math.Round(bme680.Humidity, 2).ToString("N2")
                         };
 
-                        if(_options.JsonOutput)
+                        if (_options.JsonOutput)
                         {
                             Console.WriteLine(JsonConvert.SerializeObject(reading));
                         }
