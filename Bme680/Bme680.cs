@@ -311,7 +311,7 @@ namespace Bme680
 
             // Calculate the temperature.
             var var1 = ((adcTemperature / 16384.0) - (_calibrationData.TCal1 / 1024.0)) * _calibrationData.TCal2;
-            var var2 = Math.Pow(((adcTemperature / 131072.0) - (_calibrationData.TCal1 / 8192.0)), 2) * _calibrationData.TCal3;
+            var var2 = Math.Pow(((adcTemperature / 131072.0) - (_calibrationData.TCal1 / 8192.0)), 2) * _calibrationData.TCal3 * 16;
 
             return Temperature.FromCelsius((var1 + var2) / 5120.0);
         }
